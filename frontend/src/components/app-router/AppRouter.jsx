@@ -12,7 +12,7 @@ function AppRouter() {
     const breakpoints = useBreakpoint()
 
     return (
-        <Layout>
+        <Layout style={{minHeight: "100vh"}}>
             <Header style={{ marginBottom: 10, backgroundColor: 'white', padding: breakpoints.xxl ? '0 200px' : 0}}>
                 <Navbar />
             </Header>
