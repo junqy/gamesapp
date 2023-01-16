@@ -1,4 +1,4 @@
-import 'antd/dist/antd.css';
+import 'antd/dist/reset.css';
 import AppRouter from './components/app-router/AppRouter';
 import './App.css'
 

@@ -4,6 +4,7 @@ import Home from '../home/Home'
 import Navbar from '../navbar/Navbar'
 import Games from '../games/Games'
 import { Layout, Grid } from 'antd';
+import AccountManagement from '../user/AccountManagement'
 
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
@@ -20,6 +21,7 @@ function AppRouter() {
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/games' element={<Games />} />
+                    <Route path='/user' element={<AccountManagement />} />
                 </Routes>
             </Content>
             <Footer style={{ textAlign: 'center'}}>
