@@ -17,7 +17,7 @@ function AppRouter() {
             <Header style={{ marginBottom: 10, backgroundColor: 'white', padding: breakpoints.xxl ? '0 200px' : 0}}>
                 <Navbar />
             </Header>
-            <Content style={{ padding: breakpoints.xxl ? '0 220px' : 20 }}>
+            <Content style={{ padding: breakpoints.xxl ? '16px 216px' : 16 }}>
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/games' element={<Games />} />

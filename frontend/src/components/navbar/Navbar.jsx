@@ -12,28 +12,27 @@ function Navbar() {
     const location = useLocation();
     const { pathname } = location;
     const breakpoints = useBreakpoint()
-    console.log(pathname)
+    console.log(!breakpoints.xs)
     return (
-        <Menu mode='horizontal' style={{justifyContent: 'flex-end', alignItems: 'center'}} selectedKeys={[pathname]}>
+        <Menu mode='horizontal' style={{ display: 'flex' }} selectedKeys={[pathname]}>
                 <Menu.Item key='/'>
                    <Link to='/'><Title level={4} style={{fontWeight: 700, margin: '18px 0px 19px 0'}}>GAMEBAG</Title></Link>
                 </Menu.Item>
-                <Menu.Item style={{ flex: 1 }} key='searchBar' >
-                    <Search placeholder="wpisz wyszukiwaną frazę" allowClear style={{marginTop: 15}}/>
+                <Menu.Item style={{ marginLeft: 'auto', width: '48%', cursor: 'default' }} key='searchBar'>
+                    <Search placeholder="wpisz wyszukiwaną frazę..." allowClear style={{marginTop: 16}}/>
                 </Menu.Item>
-                
-                {!breakpoints.xs ? 
+                {breakpoints.md ? 
                 <>
-                <Menu.Item key='/games' >
-                    <Link style={{fontWeight: 600}} to='/games'>Biblioteka Gier</Link>
-                </Menu.Item>
-                <Menu.SubMenu key='submenuBig' icon={<UserOutlined style={{ marginLeft: 10 }}/>} style={{ float: 'right' }}>
-                    <Menu.Item key='/user'>
-                        <Link style={{fontWeight: 600}} to='/user'>Użytkownik</Link>
+                    <Menu.Item key='/games' >
+                        <Link style={{fontWeight: 600}} to='/games'>Biblioteka Gier</Link>
                     </Menu.Item>
-                </Menu.SubMenu>
+                    <Menu.SubMenu key='submenuBig' icon={<UserOutlined style={{ marginLeft: 10 }}/>}>
+                        <Menu.Item key='/user'>
+                            <Link style={{fontWeight: 600}} to='/user'>Użytkownik</Link>
+                        </Menu.Item>
+                    </Menu.SubMenu>
                 </> :
-                <Menu.SubMenu key='submenuSmall' icon={<MenuOutlined style={{ marginLeft: 10 }}/>} style={{ float: 'right' }}>
+                <Menu.SubMenu key='submenuSmall' icon={<MenuOutlined/>}>
                     <Menu.Item key='/games' >
                         <Link style={{fontWeight: 600}} to='/games'>Biblioteka Gier</Link>
                     </Menu.Item>
