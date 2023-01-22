@@ -5,6 +5,7 @@ import Navbar from '../navbar/Navbar'
 import Games from '../games/Games'
 import { Layout, Grid } from 'antd';
 import AccountManagement from '../user/AccountManagement'
+import SignForm from '../user/SignForm'
 
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
@@ -22,6 +23,8 @@ function AppRouter() {
                     <Route path='/' element={<Home />} />
                     <Route path='/games' element={<Games />} />
                     <Route path='/user' element={<AccountManagement />} />
+                    <Route path='/sign_in' element={<SignForm />} />
+                    <Route path='/sign_up' element={<SignForm />} />
                 </Routes>
             </Content>
             <Footer style={{ textAlign: 'center'}}>
