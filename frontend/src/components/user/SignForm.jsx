@@ -2,14 +2,25 @@ import React from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Row, Col, Space, Typography } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
+import * as UserCredentialsService from '../../api/services/UserCredentialsService'
 const { Title } = Typography
 
 function SignForm() {
     const { pathname } = useLocation()
 
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
+        if (pathname === '/sign_in') {
+            const userObject = {
+                email: values.email,
+                password: values.password
+            }
+
+            const response = await UserCredentialsService.authenticate(userObject)
+            console.log(response)
+        }
         console.log('Success:', values);
     };
+    
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
