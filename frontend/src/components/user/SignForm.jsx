@@ -17,10 +17,18 @@ function SignForm() {
 
             const response = await UserCredentialsService.authenticate(userObject)
             console.log(response)
+        } else {
+            const userObject = {
+                username: values.username,
+                email: values.email,
+                password: values.password
+            }
+
+            const response = await UserCredentialsService.register(userObject)
+            console.log(response)
         }
-        console.log('Success:', values);
     };
-    
+
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
@@ -64,9 +72,8 @@ function SignForm() {
                             },
                         ]}
                     >
-                        <Input
+                        <Input.Password
                             prefix={<LockOutlined className="site-form-item-icon" />}
-                            type="password"
                             placeholder="Hasło"
                         />
                     </Form.Item>
