@@ -1,12 +1,13 @@
 import React from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Row, Col, Space, Typography } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as UserCredentialsService from '../../api/services/UserCredentialsService'
 const { Title } = Typography
 
 function SignForm() {
     const { pathname } = useLocation()
+    const navigate = useNavigate()
 
     const onFinish = async (values) => {
         if (pathname === '/sign_in') {
@@ -16,6 +17,7 @@ function SignForm() {
             }
 
             const response = await UserCredentialsService.authenticate(userObject)
+            navigate('/')
             console.log(response)
         } else {
             const userObject = {
@@ -25,6 +27,7 @@ function SignForm() {
             }
 
             const response = await UserCredentialsService.register(userObject)
+            navigate('/')
             console.log(response)
         }
     };

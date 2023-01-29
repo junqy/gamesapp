@@ -2,28 +2,16 @@ import mongoose from "mongoose"
 
 const GameSchema = new mongoose.Schema({
     apiId: {
-        type: Number,
+        type: String,
         required: true
     },
-    name: {
-        type: String,
-        required: true,
-        min: 2,
-        max: 150
+    comments: {
+        type: Array,
+        default: []
     },
-    description: {
-        type: String,
-        required: true,
-        max: 500
-    },
-    metacritic: {
-        type: Number,
-    },
-    tba: {
-        type: Boolean,
-    },
-    released: {
-        type: String,
+    ratings: {
+        type: Array,
+        default: []
     }
 }, { timestamps: true })
 

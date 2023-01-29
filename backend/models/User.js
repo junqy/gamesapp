@@ -25,6 +25,10 @@ const UserSchema = new mongoose.Schema({
     gamesPlayed: {
         type: Array,
         default: []
+    },
+    friends: {
+        type: Array,
+        default: []
     }
 }, { timestamps: true })
 
