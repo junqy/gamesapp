@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Home from '../home/Home'
 import Navbar from '../navbar/Navbar'
 import Games from '../games/Games'
@@ -10,21 +10,21 @@ import SignForm from '../user/SignForm'
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
 
-function AppRouter() {
+function AppRouter({isAuth}) {
     const breakpoints = useBreakpoint()
 
     return (
         <Layout style={{minHeight: "100vh"}}>
             <Header style={{ marginBottom: 10, backgroundColor: 'white', padding: breakpoints.xxl ? '0 200px' : 0}}>
-                <Navbar />
+                <Navbar isAuth={isAuth}/>
             </Header>
             <Content style={{ padding: breakpoints.xxl ? '16px 216px' : 16 }}>
                 <Routes>
                     <Route path='/' element={<Home />} />
                     <Route path='/games' element={<Games />} />
-                    <Route path='/user' element={<AccountManagement />} />
-                    <Route path='/sign_in' element={<SignForm />} />
-                    <Route path='/sign_up' element={<SignForm />} />
+                    <Route path='/user' element={isAuth ? <AccountManagement /> : <Navigate to="/sign_in" />} />
+                    <Route path='/sign_in' element={!isAuth ? <SignForm /> : <Navigate to="/" />} />
+                    <Route path='/sign_up' element={!isAuth ? <SignForm /> : <Navigate to="/" />} />
                 </Routes>
             </Content>
             <Footer style={{ textAlign: 'center'}}>

@@ -1,5 +1,6 @@
 import axios from "axios"
 import axiosRetry from 'axios-retry';
+import { axiosErrorHandlers } from "./services/ErrorHandler";
 
 export const JSON_FORMAT = 'application/json';
 export const MULTIPART_FORM_DATA_FORMAT = "multipart/form-data";
@@ -57,11 +58,11 @@ export async function httpRequest(method, url, body, contentType, params, config
 export async function httpRequestPostForm(url, body) {
     return api.postForm(url, body)
         .then((response) => response.data)
-        .catch((error) => console.log(error))
+        .catch((error) => axiosErrorHandlers.responseErrorHandler(error))
 }
 
 export function handleRequestError(error) {
-    return error
+    return axiosErrorHandlers.responseErrorHandler(error)
 }
 
 function formatParams(urlParams) {

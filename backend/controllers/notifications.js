@@ -34,3 +34,12 @@ export const deleteNotification = async (req, res) => {
         res.status(404).json({ message: err.message })
     }
 }
+
+export const deleteAllNotifications = async (req, res) => {
+    try {
+        await Notification.deleteMany()
+        res.status(200).json("successfully deleted notifications")
+    } catch (err) {
+        res.status(404).json({ message: err.message })
+    }
+}

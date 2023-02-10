@@ -2,3 +2,10 @@
     border: none !important;
 }
 
+.ant-dropdown-menu-title-content {
+    color: black
+}
+
+.ant-dropdown-menu-item-active {
+    color: yellow
+}
