@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { UserOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import { Avatar, List, message, Card, Button } from "antd";
+import {
+    UserOutlined,
+    MinusCircleOutlined,
+} from "@ant-design/icons";
+import { Avatar, List, message, Card, Button, Space } from "antd";
 import VirtualList from "rc-virtual-list";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
@@ -11,7 +14,7 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
     const dispatch = useDispatch();
     const friends = useSelector((state) => state.friends);
     const [messageApi, contextHolder] = message.useMessage();
-    const isAuthUserProfile = currentUser === userId
+    const isAuthUserProfile = currentUser === userId;
 
     const getFriends = async () => {
         setLoading(true);
@@ -64,46 +67,58 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
         <>
             {contextHolder}
             <Card title="Lista znajomych">
-                <List size="small">
-                    <VirtualList
-                        data={friends}
-                        height={calculateListHeight(friends.length)}
-                        itemHeight={47}
-                        itemKey="_id"
-                    >
-                        {(item) => (
-                            <List.Item key={item._id}>
-                                <List.Item.Meta
-                                    avatar={
-                                        item.picture ? (
-                                            <Avatar src={item.picture} />
-                                        ) : (
-                                            <Avatar
-                                                icon={<UserOutlined />}
-                                                shape="square"
-                                            />
-                                        )
-                                    }
-                                    title={
-                                        <Link to={`/user/${item._id}`}>
-                                            {item.username}
-                                        </Link>
-                                    }
-                                    description={item.email}
-                                />
-                                {isAuthUserProfile && (
-                                    <Button
-                                        disabled={loading}
-                                        icon={<MinusCircleOutlined />}
-                                        onClick={() =>
-                                            addRemoveFriend(item._id)
+                {friends.length > 0 ? (
+                    <List size="small">
+                        <VirtualList
+                            data={friends}
+                            height={calculateListHeight(friends.length)}
+                            itemHeight={47}
+                            itemKey="_id"
+                        >
+                            {(item) => (
+                                <List.Item key={item._id}>
+                                    <List.Item.Meta
+                                        avatar={
+                                            item.picture ? (
+                                                <Avatar src={item.picture} />
+                                            ) : (
+                                                <Avatar
+                                                    icon={<UserOutlined />}
+                                                    shape="square"
+                                                />
+                                            )
                                         }
+                                        title={
+                                            <Link to={`/user/${item._id}`}>
+                                                {item.username}
+                                            </Link>
+                                        }
+                                        description={item.email}
                                     />
-                                )}
-                            </List.Item>
-                        )}
-                    </VirtualList>
-                </List>
+                                    {isAuthUserProfile && (
+                                        <Button
+                                            disabled={loading}
+                                            icon={<MinusCircleOutlined />}
+                                            onClick={() =>
+                                                addRemoveFriend(item._id)
+                                            }
+                                        />
+                                    )}
+                                </List.Item>
+                            )}
+                        </VirtualList>
+                    </List>
+                ) : (
+                    <Space
+                        size={10}
+                        style={{
+                            width: "100%",
+                            justifyContent: "center",
+                        }}
+                    >
+                        Użytkownik nie ma żadnych znajomych.
+                    </Space>
+                )}
             </Card>
         </>
     );

@@ -6,6 +6,7 @@ import {
     UserDeleteOutlined,
 } from "@ant-design/icons";
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
+import * as UserNotificationsService from "../../../api/services/UserNotificationsService"
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends, setUserFriends, addFriend } from "../../../state";
 import {
@@ -56,6 +57,20 @@ function DataWidget(props) {
                           ),
                       })
             );
+            if (!isFriend) {
+                const notificationResponse = await UserNotificationsService.create({
+                    username: username,
+                    toUserId: props.userId
+                })
+                if (!notificationResponse.error) {
+                    return true
+                } else {
+                    messageApi.open({
+                        type: "error",
+                        content: "Wystąpił błąd pobierania danych.",
+                    });
+                }
+            }
         } else {
             messageApi.open({
                 type: "error",

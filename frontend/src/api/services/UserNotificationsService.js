@@ -1,4 +1,4 @@
-import { httpDelete, httpGet } from "../ApiService";
+import { httpDelete, httpGet, httpPost } from "../ApiService";
 
 const url = "notifications";
 
@@ -12,4 +12,8 @@ export async function remove(id) {
 
 export async function removeAll() {
     return httpDelete(url, null);
+}
+
+export async function create(data) {
+    return httpPost(url, data)
 }
