@@ -1,14 +1,11 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import {
-    UserOutlined,
-    MinusCircleOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { Avatar, List, message, Card, Button, Space } from "antd";
 import VirtualList from "rc-virtual-list";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
-import { setFriends } from "../../../state";
+import { setFriends, setUserFriends } from "../../../state";
 
 function FriendsWidget({ userId, currentUser, loading, setLoading }) {
     const dispatch = useDispatch();
@@ -39,6 +36,7 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
         setLoading(false);
         if (!response.error) {
             dispatch(setFriends({ friends: response }));
+            dispatch(setUserFriends({ friends: response }));
         } else {
             messageApi.open({
                 type: "error",
@@ -49,11 +47,11 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
 
     const calculateListHeight = (count) => {
         if (count < 2) {
-            return 60;
+            return 70;
         } else if (count === 2) {
-            return 120;
+            return 130;
         } else if (count === 3) {
-            return 180;
+            return 200;
         } else {
             return 260;
         }
