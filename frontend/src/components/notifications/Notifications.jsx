@@ -1,6 +1,6 @@
 import React, { useEffect, useState }  from 'react'
 import { BellOutlined } from '@ant-design/icons'
-import { Dropdown, message, Badge, Button, Divider, Space, theme } from 'antd';
+import { Dropdown, message, Badge, Button, theme } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import * as UserNotificationsService from '../../api/services/UserNotificationsService'
 import { setNotifications, setNotificationsEmpty } from '../../state';
@@ -54,7 +54,7 @@ function Notifications() {
         } else {
             messageApi.open({
                 type: 'error',
-                content: 'Wystąpił błąd, spróbuj ponownie.'
+                content: 'Wystąpił błąd pobierania danych powiadomień.'
             })
         }
         
@@ -74,10 +74,11 @@ function Notifications() {
 
     useEffect(() => {
         getNotifications()
-        console.log(notifications)
     }, [])
 
     return (
+        <>
+        {contextHolder}
         <Dropdown
             style={{ display: 'flex' }}
             menu={{
@@ -109,6 +110,7 @@ function Notifications() {
                     </Badge>
                 </a>
         </Dropdown>
+        </>
     )
 }
 

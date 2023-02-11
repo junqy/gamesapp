@@ -1,10 +1,11 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     user: null,
     token: null,
-    games: []
-}
+    friends: [],
+    games: [],
+};
 
 export const authSlice = createSlice({
     name: "auth",
@@ -18,32 +19,47 @@ export const authSlice = createSlice({
             state.user = null;
             state.token = null;
         },
-        setFriends: (state, action) => {
+        setUserFriends: (state, action) => {
             if (state.user) {
                 state.user.friends = action.payload.friends;
             } else {
-                console.error("user friends non existent")
+                console.error("user friends non existent");
             }
+        },
+        setFriends: (state, action) => {
+            state.friends = action.payload.friends;
+        },
+        addFriend: (state, action) => {
+            state.friends.push(action.payload.friend)
         },
         setNotifications: (state, action) => {
             if (state.user) {
                 state.user.notifications = action.payload.notifications;
             } else {
-                console.error("user notifications non existent")
+                console.error("user notifications non existent");
             }
         },
         setNotificationsEmpty: (state) => {
             if (state.user) {
-                state.user.notifications = []
+                state.user.notifications = [];
             } else {
-                console.error("user notifications non existent")
+                console.error("user notifications non existent");
             }
         },
         setGames: (state, action) => {
             state.games = action.payload.games;
-        }
-    }
-})
+        },
+    },
+});
 
-export const { setLogin, setLogout, setFriends, setNotifications, setNotificationsEmpty, setGames } = authSlice.actions
-export default authSlice.reducer
+export const {
+    setLogin,
+    setLogout,
+    setFriends,
+    setUserFriends,
+    addFriend,
+    setNotifications,
+    setNotificationsEmpty,
+    setGames,
+} = authSlice.actions;
+export default authSlice.reducer;
