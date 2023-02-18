@@ -6,7 +6,12 @@ export const JSON_FORMAT = "application/json";
 export const MULTIPART_FORM_DATA_FORMAT = "multipart/form-data";
 export const api = axios.create({
     baseURL: process.env.REACT_APP_SERVER_URL,
-    timeout: 10000,
+    timeout: 50000,
+});
+
+export const rawgApi = axios.create({
+    baseURL: process.env.REACT_APP_RAWG_URL,
+    timeout: 50000,
 });
 
 function isAbortedOrSafeRequestError(error) {
@@ -43,6 +48,34 @@ export async function httpRequest(
     config
 ) {
     return api
+        .request({
+            url,
+            method,
+            params,
+            paramsSerializer: formatParams(),
+            data: processBody(body, contentType),
+            headers: {
+                "Content-Type": contentType,
+            },
+            ...config,
+        })
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            return handleRequestError(error);
+        });
+}
+
+export async function httpRequestRawgApi(
+    method,
+    url,
+    body,
+    contentType,
+    params,
+    config
+) {
+    return rawgApi
         .request({
             url,
             method,

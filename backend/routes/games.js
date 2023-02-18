@@ -1,5 +1,5 @@
 import express from "express"
-import { importGames, getFeedGames } from "../controllers/games.js"
+import { importGames, getFeedGames, getGame } from "../controllers/games.js"
 // getFeedGames, getUserGames, rateGame, commentGame
 import { verifyToken } from "../middleware/auth.js"
 
@@ -10,7 +10,7 @@ router.post("/import", importGames)
 
 // READ
 router.get("/", getFeedGames)
-// router.get("/:userId/games", getUserGames)
+router.get("/:apiId", getGame)
 
 // UPDATE
 // router.patch("/:id/rate", verifyToken, rateGame)

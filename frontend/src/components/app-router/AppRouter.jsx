@@ -26,7 +26,17 @@ function AppRouter({ isAuth, currentUser, loading, setLoading }) {
             </Header>
             <Content style={{ padding: breakpoints.xxl ? "16px 216px" : 16 }}>
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/">
+                        <Route
+                            path=""
+                            element={
+                                <Home
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                    </Route>
                     <Route path="/games" element={<Games />} />
                     <Route
                         path="/user/:id"

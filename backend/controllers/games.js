@@ -11,6 +11,21 @@ export const importGames = async (req, res) => {
     }
 }
 
+export const createGame = async (req, res) => {
+    try {
+        const { apiId } = req.body
+        const newGame = new Game({
+            apiId,
+            comments: [],
+            ratings: []
+        })
+        const savedGame = await newGame.save()
+        res.status(201).json(savedGame)
+    } catch (err) {
+        res.status(404).json({ message: err.message })
+    }
+}
+
 export const getFeedGames = async (req, res) => {
     try {
         const { genre, search } = req.query
@@ -27,15 +42,15 @@ export const getFeedGames = async (req, res) => {
         const count = await Game.countDocuments(query)
         res.status(200).json({ games, page, pages: Math.ceil(count / limit), totalGames: count})
 
-    } catch (err) {
+    } catch (err) { 
         res.status(404).json({ message: err.message })
     }
 }
 
 export const getGame = async (req, res) => {
     try {
-        const { id } = req.params
-        const game = await Game.findById(id)
+        const { apiId } = req.params
+        const game = await Game.find({ apiId })
         res.status(200).json(game)
     } catch (err) {
         res.status(404).json({ message: err.message })

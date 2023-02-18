@@ -49,6 +49,9 @@ export const authSlice = createSlice({
         setGames: (state, action) => {
             state.games = action.payload.games;
         },
+        addGamesPage: (state, action) => {
+            state.games = [...state.games, ...action.payload.games]
+        }
     },
 });
 
@@ -61,5 +64,6 @@ export const {
     setNotifications,
     setNotificationsEmpty,
     setGames,
+    addGamesPage
 } = authSlice.actions;
 export default authSlice.reducer;
