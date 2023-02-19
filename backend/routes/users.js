@@ -14,7 +14,7 @@ router.get("/:id", getUser)
 router.get("/:id/games", getUserGames)
 router.get("/:id/friends", getUserFriends)
 
-router.patch("/:id/:gameId", verifyToken, addRemoveGame)
+router.patch("/:id/:apiId", verifyToken, addRemoveGame)
 router.patch("/friends/:id/:friendId", verifyToken, addRemoveFriend)
 
 export default router

@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, List } from "antd";
+import { Card, List, Badge } from "antd";
+import { NavLink } from "react-router-dom";
 
 const { Meta } = Card;
 
@@ -18,22 +19,39 @@ function Games({ games }) {
             dataSource={games}
             renderItem={(item) => (
                 <List.Item style={{ padding: 0 }}>
-                    <Card
-                        hoverable
-                        cover={
-                            <img alt="gameImg" src={item.background_image} />
-                        }
-                    >
-                        <Meta
-                            title={item.name}
-                            description={item.genres?.map((genre) =>
-                                item.genres[item.genres.length - 1].id ===
-                                genre.id
-                                    ? genre.name
-                                    : genre.name + " / "
-                            )}
-                        />
-                    </Card>
+                    <NavLink to={`/game/${item.id}`}>
+                        <Card
+                            hoverable
+                            cover={
+                                <img
+                                    alt="gameImg"
+                                    src={item.background_image}
+                                />
+                            }
+                        >
+                            <Meta
+                                title={item.name}
+                                description={item.genres?.map((genre) =>
+                                    item.genres[item.genres.length - 1].id ===
+                                    genre.id
+                                        ? genre.name
+                                        : genre.name + " / "
+                                )}
+                                avatar={
+                                    <Badge
+                                        count={item.metacritic}
+                                        color={
+                                            item.metacritic > 74
+                                                ? "#52c41a"
+                                                : item.metacritic > 50
+                                                ? "#faad14"
+                                                : ""
+                                        }
+                                    />
+                                }
+                            />
+                        </Card>
+                    </NavLink>
                 </List.Item>
             )}
         />

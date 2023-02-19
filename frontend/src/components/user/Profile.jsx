@@ -52,8 +52,6 @@ function Profile({ currentUser, loading, setLoading, isAuth }) {
                         setLoading={setLoading}
                     />
                 </Col>
-            </Row>
-            <Row gutter={[24, 24]}>
                 <Col xs={24}>Games</Col>
             </Row>
         </>

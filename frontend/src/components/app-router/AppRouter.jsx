@@ -6,6 +6,8 @@ import Games from "../games/Games";
 import { Layout, Grid } from "antd";
 import Profile from "../user/Profile";
 import SignForm from "../user/SignForm";
+import Sidebar from "../side-bar/Sidebar";
+import Game from "../games/Game";
 
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
@@ -26,7 +28,7 @@ function AppRouter({ isAuth, currentUser, loading, setLoading }) {
             </Header>
             <Content style={{ padding: breakpoints.xxl ? "16px 216px" : 16 }}>
                 <Routes>
-                    <Route path="/">
+                    <Route path="/" element={<Sidebar />}>
                         <Route
                             path=""
                             element={
@@ -36,8 +38,8 @@ function AppRouter({ isAuth, currentUser, loading, setLoading }) {
                                 />
                             }
                         />
+                        <Route path="/game/:id" element={<Game />} />
                     </Route>
-                    <Route path="/games" element={<Games />} />
                     <Route
                         path="/user/:id"
                         element={

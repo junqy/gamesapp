@@ -1,7 +1,7 @@
 import "./Navbar.css";
-import React, { useState } from "react";
-import { MenuOutlined, UserOutlined, BellOutlined } from "@ant-design/icons";
-import { Input, Menu, Typography, Grid, Dropdown } from "antd";
+import React from "react";
+import { MenuOutlined, UserOutlined } from "@ant-design/icons";
+import { Input, Menu, Typography, Grid } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../state";
@@ -64,13 +64,9 @@ function Navbar({ isAuth, currentUser }) {
             </Menu.Item>
             {breakpoints.md ? (
                 <>
-                    <Menu.Item key="/games" style={{ marginLeft: "auto" }}>
-                        <Link style={{ fontWeight: 600 }} to="/games">
-                            Biblioteka Gier
-                        </Link>
-                    </Menu.Item>
                     <Menu.SubMenu
                         key="submenuBig"
+                        style={{ marginLeft: "auto" }}
                         icon={<UserOutlined style={{ marginLeft: 10 }} />}
                     >
                         {isAuth ? (
@@ -121,11 +117,6 @@ function Navbar({ isAuth, currentUser }) {
                         style={{ marginLeft: "auto" }}
                         icon={<MenuOutlined />}
                     >
-                        <Menu.Item key="/games">
-                            <Link style={{ fontWeight: 600 }} to="/games">
-                                Biblioteka Gier
-                            </Link>
-                        </Menu.Item>
                         {isAuth ? (
                             <>
                                 <Menu.Item key="/user">

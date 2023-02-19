@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { message, Row, Col, Menu, Space } from "antd";
+import { message, Row, Col, Space } from "antd";
 import * as GamesService from "../../api/services/rawg-services/GamesService";
 import Games from "../games/Games";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,38 +8,14 @@ import useOnScreen from "../../hooks/useOnScreen";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
 
-function getItem(label, key, children, icon) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    };
-}
-
-const items = [
-    getItem("Wszystkie gry", "/"),
-    getItem("Navigation Two", "2"),
-    getItem("Navigation Two", "sub1", [
-        getItem("Option 3", "3"),
-        getItem("Option 4", "4"),
-    ]),
-    getItem("Navigation Three", "sub2", [
-        getItem("Option 7", "7"),
-        getItem("Option 8", "8"),
-        getItem("Option 9", "9"),
-        getItem("Option 10", "10"),
-    ]),
-];
-
 const spinIcon = (
     <LoadingOutlined
-    style={{
-        fontSize: 32,
-    }}
-    spin
-/>
-)
+        style={{
+            fontSize: 32,
+        }}
+        spin
+    />
+);
 
 function Home({ loading, setLoading }) {
     const bottomRef = useRef(null);
@@ -50,9 +26,9 @@ function Home({ loading, setLoading }) {
     const isBottom = useOnScreen(bottomRef);
 
     const getGames = async () => {
-        setLoading(true)
+        setLoading(true);
         const response = await GamesService.getGames(page);
-        setLoading(false)
+        setLoading(false);
         if (!response.error) {
             if (page === 1) {
                 dispatch(setGames({ games: response.results }));
@@ -71,20 +47,14 @@ function Home({ loading, setLoading }) {
 
     useEffect(() => {
         getGames();
+        console.log(games);
     }, [isBottom]);
 
     return (
         <>
+            {contextHolder}
             <Row gutter={[24, 24]}>
-                <Col xs={24} md={4}>
-                    <Menu
-                        defaultSelectedKeys={["/"]}
-                        defaultOpenKeys={["sub1"]}
-                        items={items}
-                        mode="inline"
-                    />
-                </Col>
-                <Col xs={24} md={20}>
+                <Col xs={24}>
                     <Games games={games} />
                 </Col>
                 <Col ref={bottomRef} xs={24}>
@@ -94,9 +64,7 @@ function Home({ loading, setLoading }) {
                             justifyContent: "center",
                         }}
                     >
-                        {loading && (
-                            <Spin indicator={spinIcon} />
-                        )}
+                        {loading && <Spin indicator={spinIcon} />}
                     </Space>
                 </Col>
             </Row>

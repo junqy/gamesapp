@@ -24,14 +24,14 @@ export const getUserGames = async (req, res) => {
 
 export const addRemoveGame = async (req, res) => {
     try {
-        const { id, gameId } = req.params
+        const { id, apiId } = req.params
         const user = await User.findById(id)
-        const game = await Game.findById(gameId)
+        const game = await Game.find({apiId})
 
-        if (user.gamesPlayed.includes(gameId)) {
-            user.gamesPlayed = user.gamesPlayed.filter((id) => id !== game.apiId)
+        if (user.gamesPlayed.includes(apiId)) {
+            user.gamesPlayed = user.gamesPlayed.filter((id) => id !== apiId)
         } else {
-            user.gamesPlayed.push(game.apiId)
+            user.gamesPlayed.push(apiId)
         }
 
         await user.save()
