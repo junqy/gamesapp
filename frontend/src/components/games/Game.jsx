@@ -13,6 +13,8 @@ import {
     Rate,
     Badge,
     Progress,
+    Carousel,
+    Image,
 } from "antd";
 import {
     CalendarOutlined,
@@ -40,11 +42,20 @@ const customIcons = {
     4: <GiGoat />,
 };
 
+const contentStyle = {
+    height: "260px",
+    color: "#fff",
+    lineHeight: "260px",
+    textAlign: "center",
+    background: "#364d79",
+};
+
 function Game() {
     const { token } = useToken();
     const [game, setGame] = useState(null);
     const [gameDb, setGameDb] = useState(null);
     const [gameTrailers, setGameTrailers] = useState(null);
+    const [gameScreenshots, setGameScreenshots] = useState(null);
     const [ellipsis, setEllipsis] = useState({ rows: 3 });
     const [messageApi, contextHolder] = message.useMessage();
     const { id } = useParams();
@@ -87,6 +98,19 @@ function Game() {
         }
     };
 
+    const getGameScreenshots = async () => {
+        const response = await GamesService.getGameScreenshots(id);
+        if (!response.error) {
+            console.log(response.results);
+            setGameScreenshots(response.results);
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
     const handlePlatforms = (arr) => {
         const platforms = [];
         arr?.map((platform) => platforms.push(platform.platform.slug));
@@ -114,6 +138,7 @@ function Game() {
         getGameFromApi();
         getGame();
         getGameTrailers();
+        getGameScreenshots();
     }, []);
 
     const setExpanded = () => {
@@ -218,7 +243,7 @@ function Game() {
                             }}
                         >
                             <Rate
-                                style={{ color: "cyan" }}
+                                style={{ color: "#00c1c1d6" }}
                                 character={({ index }) =>
                                     customIcons[index + 1]
                                 }
@@ -286,20 +311,40 @@ function Game() {
                     </Card>
                 </Col>
                 <Col xs={24} lg={12}>
-                    {gameTrailers?.length > 0 ?
-                    <Card
-                        cover={
-                            <video controls autoPlay muted width="100%">
+                    {gameTrailers?.length > 0 ? (
+                        <Space direction="vertical">
+                            <video controls autoPlay muted width="100%" style={{borderRadius: token.borderRadiusLG,}}>
                                 <source
-                                    src={gameTrailers[0].data[480] ? gameTrailers[0].data[480] : "empty"}
+                                    src={
+                                        gameTrailers[0].data[480]
+                                            ? gameTrailers[0].data[480]
+                                            : "empty"
+                                    }
                                     type="video/mp4"
                                 />
                                 Sorry, your browser doesn't support embedded
                                 videos.
                             </video>
-                        }
-                    ></Card> : <Card></Card>
-                }
+                            <Image.PreviewGroup>
+                                {gameScreenshots?.map((image) => (
+                                    <Image
+                                        src={image.image}
+                                        key={image.id}
+                                        width={"33.3%"}
+                                        style={{borderRadius: token.borderRadiusLG, padding: 2}}
+                                    />
+                                ))}
+                            </Image.PreviewGroup>
+                        </Space>
+                    ) : (
+                        <Image.PreviewGroup>
+                            <Carousel autoplay infinite={false}>
+                                {gameScreenshots?.map((image) => (
+                                    <Image src={image.image} key={image.id} />
+                                ))}
+                            </Carousel>
+                        </Image.PreviewGroup>
+                    )}
                 </Col>
             </Row>
         </>

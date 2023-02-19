@@ -19,4 +19,8 @@ export async function getGameTrailers(id) {
     return httpGetAPI(url + `/${id}/movies?key=${apiKey}`)
 }
 
+export async function getGameScreenshots(id) {
+    return httpGetAPI(url + `/${id}/screenshots?key=${apiKey}`)
+}
+
 //https://api.rawg.io/api/games/3498/movies?key=8da0937aad7a4eeb94b880a71a9ca9c0&
