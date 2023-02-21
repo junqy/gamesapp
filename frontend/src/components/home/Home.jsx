@@ -67,7 +67,6 @@ function Home({ loading, setLoading }) {
 
     useEffect(() => {
         handleQueryParams();
-        console.log(games);
     }, [isBottom]);
 
     return (

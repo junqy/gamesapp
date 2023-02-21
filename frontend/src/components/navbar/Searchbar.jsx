@@ -61,7 +61,6 @@ function Searchbar({ loading, setLoading }) {
     };
 
     const onSelect = (data) => {
-        console.log(data);
         setValue("");
         navigate(`/game/${data}`);
     };

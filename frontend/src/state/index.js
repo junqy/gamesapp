@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     user: null,
     token: null,
+    gameDb: null,
     friends: [],
     games: [],
     filters: [],
@@ -76,11 +77,11 @@ export const authSlice = createSlice({
         setGameComments: (state, action) => {
             state.gameComments = action.payload.comments;
         },
-        addGameComment: (state, action) => {
-            state.gameComments.push(action.payload.comment);
+        likeComment: (state, action) => {
+            state.gameComments.map((item) => item._id === action.payload.id ? item.likes = action.payload.likes : item)
         },
         removeGameComment: (state, action) => {
-            const comment = state.gameComments.find((item) => item.id === action.payload.id)
+            const comment = state.gameComments.find((item) => item._id === action.payload.id)
             state.gameComments.pop(comment)
         },
         addGamesPage: (state, action) => {
@@ -92,6 +93,9 @@ export const authSlice = createSlice({
         addFiltersPage: (state, action) => {
             state.filters = [...state.filters, ...action.payload.filters];
         },
+        setGameDb: (state, action) => {
+            state.gameDb = action.payload.gameDb
+        }
     },
 });
 
@@ -112,7 +116,8 @@ export const {
     setGamesPlayed,
     removeGame,
     setGameComments,
-    addGameComment,
-    removeGameComment
+    removeGameComment,
+    likeComment,
+    setGameDb
 } = authSlice.actions;
 export default authSlice.reducer;

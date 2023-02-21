@@ -74,7 +74,6 @@ function FiltersPage({ loading, setLoading }) {
 
     useEffect(() => {
         handleQueryParams();
-        console.log(filters);
     }, [isBottom]);
 
     return (

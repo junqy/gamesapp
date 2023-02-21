@@ -39,7 +39,6 @@ function SignForm() {
                         token: response.token,
                     })
                 );
-                console.log(response);
                 navigate("/");
             } else {
                 messageApi.open({

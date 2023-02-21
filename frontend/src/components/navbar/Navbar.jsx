@@ -90,7 +90,7 @@ function Navbar({ isAuth, currentUser, loading, setLoading }) {
                     <Menu.SubMenu
                         key="submenuSmall"
                         style={{ marginLeft: "auto" }}
-                        icon={<MenuOutlined />}
+                        icon={<UserOutlined />}
                     >
                         {isAuth ? (
                             <>

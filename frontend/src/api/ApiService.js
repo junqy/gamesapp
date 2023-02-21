@@ -1,8 +1,5 @@
 import { httpRequest, httpRequestPostForm, httpRequestRawgApi, JSON_FORMAT, MULTIPART_FORM_DATA_FORMAT } from "./ApiUtils"
 
-console.log(process.env.REACT_APP_API_KEY)
-const apiKey = process.env.REACT_APP_API_KEY
-
 export function httpGet(url, params, config = {}) {
     return httpRequest('GET', url, null, null, params, config)
 }

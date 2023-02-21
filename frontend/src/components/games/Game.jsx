@@ -16,6 +16,11 @@ import {
     Image,
     List,
     Avatar,
+    Form,
+    Mentions,
+    Divider,
+    Statistic,
+    Grid,
 } from "antd";
 import { Comment } from "@ant-design/compatible";
 import {
@@ -25,8 +30,12 @@ import {
     RedditOutlined,
     UserOutlined,
     MinusCircleOutlined,
+    LikeOutlined,
+    LikeFilled,
+    DeleteOutlined,
+    StarFilled,
 } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import * as GamesService from "../../api/services/rawg-services/GamesService";
 import * as UserDetailsService from "../../api/services/UserDetailsService";
 import * as GameCommentsService from "../../api/services/GameCommentsService";
@@ -35,29 +44,29 @@ import {
     handlePlatformSimplify,
 } from "../../helpers/HandlePlatformIcon";
 import { convertDate, calculateHours } from "../../helpers/HandleDateFormat";
-import { FaThumbsUp, FaThumbsDown, FaPoop, FaWindows } from "react-icons/fa";
-import { GiGoat } from "react-icons/gi";
+import { FaWindows } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setGameComments, setUserGames } from "../../state";
+import {
+    setGameComments,
+    setUserGames,
+    likeComment,
+    removeGameComment,
+    setGameDb,
+} from "../../state";
 import Spinner from "../loading/Spinner";
 import "./Game.css";
 
 const { Title, Text, Paragraph } = Typography;
 const { useToken } = theme;
-
-const customIcons = {
-    1: <FaPoop />,
-    2: <FaThumbsDown />,
-    3: <FaThumbsUp />,
-    4: <GiGoat />,
-};
+const { useBreakpoint } = Grid;
 
 function Game({ loading, setLoading, currentUser, isAuth }) {
+    const [form] = Form.useForm();
     const dispatch = useDispatch();
     const { token } = useToken();
     const [game, setGame] = useState(null);
-    const [gameDb, setGameDb] = useState(null);
+    const gameDb = useSelector((state) => state.gameDb);
     const [gameTrailers, setGameTrailers] = useState(null);
     const [gameScreenshots, setGameScreenshots] = useState(null);
     const [gameReddits, setGameReddits] = useState(null);
@@ -72,11 +81,11 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
     );
     const gameComments = useSelector((state) => state.gameComments);
     const isUserGame = currentUserGames.includes(id);
+    const breakpoints = useBreakpoint();
 
     const getGameFromApi = async () => {
         const response = await GamesService.getGameDetails(id);
         if (!response.error) {
-            console.log(response);
             setGame(response);
         } else {
             messageApi.open({
@@ -89,7 +98,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
     const getGame = async () => {
         const response = await GamesService.getGameDatabase(id);
         if (!response.error) {
-            setGameDb(response);
+            dispatch(setGameDb({ gameDb: response[0] }));
         } else {
             messageApi.open({
                 type: "error",
@@ -101,7 +110,6 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
     const getGameTrailers = async () => {
         const response = await GamesService.getGameTrailers(id);
         if (!response.error) {
-            console.log(response.results);
             setGameTrailers(response.results);
         } else {
             messageApi.open({
@@ -114,7 +122,6 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
     const getGameScreenshots = async () => {
         const response = await GamesService.getGameScreenshots(id);
         if (!response.error) {
-            console.log(response.results);
             setGameScreenshots(response.results);
         } else {
             messageApi.open({
@@ -127,7 +134,6 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
     const getGameReddits = async () => {
         const response = await GamesService.getGameReddits(id);
         if (!response.error) {
-            console.log(response.results);
             setGameReddits(response.results);
         } else {
             messageApi.open({
@@ -140,8 +146,57 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
     const getGameComments = async () => {
         const response = await GameCommentsService.getGameComments(id);
         if (!response.error) {
-            console.log(response);
             dispatch(setGameComments({ comments: response }));
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
+    const addComment = async (values) => {
+        const commentObj = {
+            userId: currentUser,
+            gameId: id,
+            content: values.content,
+        };
+        setLoading(true);
+        const response = await GameCommentsService.addComment(commentObj);
+        setLoading(false);
+        if (!response.error) {
+            form.resetFields();
+            dispatch(setGameComments({ comments: response }));
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
+    const likeDislikeComment = async (id, userId) => {
+        setLoading(true);
+        const response = await GameCommentsService.likeDislikeComment(id, {
+            userId: userId,
+        });
+        setLoading(false);
+        if (!response.error) {
+            dispatch(likeComment({ id: id, likes: response.likes }));
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
+    const removeUserComment = async (id) => {
+        setLoading(true);
+        const response = await GameCommentsService.removeComment(id);
+        setLoading(false);
+        if (!response.error) {
+            dispatch(removeGameComment({ id: id }));
         } else {
             messageApi.open({
                 type: "error",
@@ -159,6 +214,23 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
         setLoading(false);
         if (!response.error) {
             dispatch(setUserGames({ games: response }));
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
+    const rateGame = async (value) => {
+        setLoading(true);
+        const response = await GamesService.rateGame(id, {
+            userId: currentUser,
+            rate: value,
+        });
+        setLoading(false);
+        if (!response.error) {
+            dispatch(setGameDb({ gameDb: response }));
         } else {
             messageApi.open({
                 type: "error",
@@ -188,6 +260,74 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                 {handlePlatformIcon(platform)}
             </div>
         ));
+    };
+
+    const handleUsersMentions = (arr) => {
+        const simplifiedUsers = arr.map((comment) => comment.username);
+        const filteredUsers = simplifiedUsers.filter(
+            (item, index) => simplifiedUsers.indexOf(item) === index
+        );
+        return filteredUsers.map((item) => ({
+            value: item,
+            label: item,
+        }));
+    };
+
+    const handleRateLabel = (index) => {
+        switch (index) {
+            case 0:
+                return "Fatalna";
+            case 1:
+                return "Może być";
+            case 2:
+                return "Dobra";
+            case 3:
+                return "Świetna!";
+            default:
+                break;
+        }
+    };
+
+    const handleRateAverage = (ratings) => {
+        const sumValues = Object.values(ratings).reduce(
+            (a, b) => parseInt(a) + parseInt(b),
+            0
+        );
+        const length = Object.keys(ratings).length;
+        return sumValues / length;
+    };
+
+    const handleUserRating = (rate) => {
+        switch (rate) {
+            case "1":
+                return <StarFilled />;
+            case "2":
+                return (
+                    <>
+                        <StarFilled />
+                        <StarFilled />
+                    </>
+                );
+            case "3":
+                return (
+                    <>
+                        <StarFilled />
+                        <StarFilled />
+                        <StarFilled />
+                    </>
+                );
+            case "4":
+                return (
+                    <>
+                        <StarFilled />
+                        <StarFilled />
+                        <StarFilled />
+                        <StarFilled />
+                    </>
+                );
+            default:
+                break;
+        }
     };
 
     const handleSystemRequirements = (arr) => {
@@ -263,7 +403,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
         });
     };
 
-    if (!game)
+    if (!game || !gameDb)
         return (
             <Space style={{ width: "100%", justifyContent: "center" }}>
                 <Spinner />
@@ -272,6 +412,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
 
     return (
         <>
+            {contextHolder}
             <Row gutter={[24, 24]}>
                 <Col xs={24} lg={12}>
                     <Space
@@ -281,7 +422,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                             backgroundColor: token.colorBgElevated,
                             boxShadow: token.boxShadow,
                             width: "100%",
-                            padding: "3px 8px 2px 8px",
+                            padding: "1px 8px 2px 8px",
                             marginBottom: 6,
                             justifyContent: "space-between",
                         }}
@@ -339,22 +480,58 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                                 format={(percent) => `${percent}`}
                             />
                         </Space>
-                        <Text type="secondary">Gatunek </Text>
-                        <div style={{ marginBottom: 8 }}>
-                            {game.genres?.map((tag) => (
-                                <Link to={`/genres/${tag.id}`} key={tag.id}>
-                                    <Tag
-                                        color="blue"
-                                        style={{
-                                            marginBottom: 3,
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        {tag.name}
-                                    </Tag>
-                                </Link>
-                            ))}
-                        </div>
+                        <Space
+                            style={{
+                                width: "100%",
+                                justifyContent: "space-between",
+                                marginBottom: breakpoints.xs ? 0 : 10,
+                            }}
+                            direction={
+                                breakpoints.xs ? "vertical" : "horizontal"
+                            }
+                        >
+                            <Space direction="vertical" size={0}>
+                                <Text type="secondary">Ocena</Text>
+                                <Rate
+                                    count={4}
+                                    disabled={!isAuth || loading}
+                                    onChange={rateGame}
+                                    value={
+                                        !isAuth
+                                            ? null
+                                            : gameDb?.ratings[currentUser]
+                                            ? gameDb?.ratings[currentUser]
+                                            : null
+                                    }
+                                    character={({ index }) => (
+                                        <Tooltip title={handleRateLabel(index)}>
+                                            <StarFilled />
+                                        </Tooltip>
+                                    )}
+                                />
+                            </Space>
+                            <Space direction="vertical" size={0}>
+                                <Text type="secondary">Gatunek </Text>
+                                <div style={{ marginBottom: 8 }}>
+                                    {game.genres?.map((tag) => (
+                                        <Link
+                                            to={`/genres/${tag.id}`}
+                                            key={tag.id}
+                                        >
+                                            <Tag
+                                                color="blue"
+                                                style={{
+                                                    marginBottom: 3,
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {tag.name}
+                                            </Tag>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </Space>
+                        </Space>
                         <Text type="secondary">Tagi </Text>
                         <div style={{ marginBottom: 10 }}>
                             {game.tags?.map((tag) => (
@@ -370,6 +547,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                                 </Link>
                             ))}
                         </div>
+
                         <Space
                             style={{
                                 width: "100%",
@@ -377,12 +555,25 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                                 marginTop: 10,
                             }}
                         >
-                            <Rate
-                                style={{ color: "#28BEE0" }}
-                                character={({ index }) =>
-                                    customIcons[index + 1]
-                                }
-                            />
+                            <Space>
+                                <Statistic
+                                    title="Średnia ocen"
+                                    prefix={
+                                        <StarFilled
+                                            style={{
+                                                color: token.colorWarningHover,
+                                            }}
+                                        />
+                                    }
+                                    value={
+                                        Object.keys(gameDb?.ratings).length > 0
+                                            ? handleRateAverage(
+                                                  gameDb.ratings
+                                              ) + "/4"
+                                            : 0
+                                    }
+                                />
+                            </Space>
                             {!isAuth ? null : isUserGame ? (
                                 <Button
                                     icon={<MinusCircleOutlined />}
@@ -615,28 +806,140 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                 </Col>
                 <Col xs={24}>
                     <Card title="Komentarze">
-                        {gameComments.map((item) => (
-                            <Comment
-                                author={item.username}
-                                avatar={
-                                    <Avatar
-                                        alt="avatar"
-                                        style={{ backgroundColor: "#28BEE0" }}
-                                    >
-                                        {item.username[0].toUpperCase()}
-                                    </Avatar>
-                                }
-                                content={item.content}
-                                datetime={
-                                    <Tooltip
-                                        title={convertDate(item.createdAt)}
-                                    >
-                                        {calculateHours(item.createdAt)}
-                                    </Tooltip>
-                                }
-                                key={item._id}
-                            />
-                        ))}
+                        {gameComments?.length > 0 ? (
+                            gameComments.map((item) => (
+                                <Comment
+                                    author={
+                                        <NavLink to={`/user/${item.userId}`}>
+                                            <span className="user-link">
+                                                {item.username}
+                                            </span>
+                                        </NavLink>
+                                    }
+                                    actions={[
+                                        <Tooltip
+                                            title={
+                                                Object.keys(
+                                                    item?.likes
+                                                ).includes(currentUser)
+                                                    ? "Nie lubię"
+                                                    : "Polub"
+                                            }
+                                        >
+                                            <span
+                                                onClick={
+                                                    isAuth
+                                                        ? () =>
+                                                              likeDislikeComment(
+                                                                  item._id,
+                                                                  currentUser
+                                                              )
+                                                        : null
+                                                }
+                                            >
+                                                {Object.keys(
+                                                    item?.likes
+                                                ).includes(currentUser) ? (
+                                                    <LikeFilled />
+                                                ) : (
+                                                    <LikeOutlined />
+                                                )}
+                                                <span
+                                                    style={{ paddingLeft: 8 }}
+                                                >
+                                                    {
+                                                        Object.keys(item?.likes)
+                                                            .length
+                                                    }
+                                                </span>
+                                            </span>
+                                        </Tooltip>,
+                                        isAuth &&
+                                            item.userId === currentUser && (
+                                                <Tooltip title="Usuń">
+                                                    <span
+                                                        onClick={() =>
+                                                            removeUserComment(
+                                                                item._id
+                                                            )
+                                                        }
+                                                    >
+                                                        <DeleteOutlined />
+                                                    </span>
+                                                </Tooltip>
+                                            ),
+                                    ]}
+                                    avatar={
+                                        <NavLink to={`/user/${item.userId}`}>
+                                            <Avatar
+                                                alt="avatar"
+                                                style={{
+                                                    backgroundColor: "#28BEE0",
+                                                }}
+                                            >
+                                                {item.username[0].toUpperCase()}
+                                            </Avatar>
+                                        </NavLink>
+                                    }
+                                    content={item.content}
+                                    datetime={
+                                        <>
+                                            <Tooltip
+                                                title={convertDate(
+                                                    item.createdAt
+                                                )}
+                                            >
+                                                {calculateHours(item.createdAt)}
+                                            </Tooltip>
+                                            {gameDb.ratings[item.userId] ? (
+                                                <span
+                                                    style={{ marginLeft: 10 }}
+                                                >
+                                                    Ocena gry:{" "}
+                                                    {handleUserRating(
+                                                        gameDb.ratings[
+                                                            item.userId
+                                                        ]
+                                                    )}
+                                                </span>
+                                            ) : null}
+                                        </>
+                                    }
+                                    key={item._id}
+                                />
+                            ))
+                        ) : (
+                            <Text type="secondary">
+                                Gra nie ma żadnych komentarzy.
+                            </Text>
+                        )}
+                        <Divider />
+                        <Form
+                            layout="horizontal"
+                            form={form}
+                            onFinish={addComment}
+                        >
+                            <Form.Item
+                                name="content"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Wprowadź komentarz",
+                                    },
+                                ]}
+                            >
+                                <Mentions
+                                    rows={3}
+                                    placeholder="Wprowadź swój komentarz (użyj @ aby komuś odpowiedzieć)"
+                                    options={handleUsersMentions(gameComments)}
+                                />
+                            </Form.Item>
+                            <Form.Item>
+                                <Button htmlType="submit" disabled={loading}>
+                                    Dodaj komentarz
+                                </Button>
+                            </Form.Item>
+                        </Form>
                     </Card>
                 </Col>
             </Row>

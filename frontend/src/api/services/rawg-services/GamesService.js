@@ -1,4 +1,4 @@
-import { httpGet, httpGetAPI } from "../../ApiService";
+import { httpGet, httpGetAPI, httpPatch } from "../../ApiService";
 
 const url = '/games'
 const apiKey = process.env.REACT_APP_API_KEY
@@ -30,4 +30,8 @@ export async function getGameScreenshots(id) {
 
 export async function getGameReddits(id) {
     return httpGetAPI(url + `/${id}/reddit?key=${apiKey}`)
+}
+
+export async function rateGame(id, data) {
+    return httpPatch(url + `/${id}/rate`, data)
 }
