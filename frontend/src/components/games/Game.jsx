@@ -26,7 +26,7 @@ import {
     UserOutlined,
     MinusCircleOutlined,
 } from "@ant-design/icons";
-import { NavLink, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as GamesService from "../../api/services/rawg-services/GamesService";
 import * as UserDetailsService from "../../api/services/UserDetailsService";
 import * as GameCommentsService from "../../api/services/GameCommentsService";
@@ -34,7 +34,7 @@ import {
     handlePlatformIcon,
     handlePlatformSimplify,
 } from "../../helpers/HandlePlatformIcon";
-import convertDate from "../../helpers/HandleDateFormat";
+import { convertDate, calculateHours } from "../../helpers/HandleDateFormat";
 import { FaThumbsUp, FaThumbsDown, FaPoop, FaWindows } from "react-icons/fa";
 import { GiGoat } from "react-icons/gi";
 import { Link } from "react-router-dom";
@@ -615,57 +615,19 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                 </Col>
                 <Col xs={24}>
                     <Card title="Komentarze">
-                        <List
-                            itemLayout="horizontal"
-                            dataSource={gameComments}
-                            renderItem={(item) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        avatar={
-                                            item.image ? (
-                                                <Avatar
-                                                    size="large"
-                                                    src={item.avatar}
-                                                />
-                                            ) : (
-                                                <NavLink
-                                                    to={`/user/${item.userId}`}
-                                                >
-                                                    <Avatar
-                                                        size="large"
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#28BEE0",
-                                                        }}
-                                                    >
-                                                        {item.username[0].toUpperCase()}
-                                                    </Avatar>
-                                                </NavLink>
-                                            )
-                                        }
-                                        title={
-                                            <Text>
-                                                {item.content}
-                                            </Text>
-                                        }
-                                        description={
-                                            <>
-                                                <UserOutlined />{" "}
-                                                <Link
-                                                    className="user-link"
-                                                    style={{ color: "black" }}
-                                                    to={`/user/${item.userId}`}
-                                                >
-                                                    {item.username}
-                                                </Link>
-                                                {" "}
-                                                {convertDate(item.createdAt)}
-                                            </>
-                                        }
-                                    />
-                                </List.Item>
-                            )}
-                        />
+                        {gameComments.map((item) => (
+                             <Comment
+                             author={item.username}
+                             avatar={<Avatar alt="avatar" style={{ backgroundColor: "#28BEE0" }}>{item.username[0].toUpperCase()}</Avatar>}
+                             content={item.content}
+                             datetime={
+                               <Tooltip title={convertDate(item.createdAt)}>
+                                 {calculateHours(item.createdAt)}
+                               </Tooltip>
+                             }
+                             key={item._id}
+                           />
+                        ))}
                     </Card>
                 </Col>
             </Row>
