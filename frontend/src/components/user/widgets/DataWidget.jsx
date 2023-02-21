@@ -1,12 +1,12 @@
 import React from "react";
-import { Avatar, Card, Button, message } from "antd";
+import { Avatar, Card, Button, message, theme } from "antd";
 import {
     UserOutlined,
     UserAddOutlined,
     UserDeleteOutlined,
 } from "@ant-design/icons";
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
-import * as UserNotificationsService from "../../../api/services/UserNotificationsService"
+import * as UserNotificationsService from "../../../api/services/UserNotificationsService";
 import { useDispatch, useSelector } from "react-redux";
 import { setFriends, setUserFriends, addFriend } from "../../../state";
 import {
@@ -15,8 +15,10 @@ import {
 } from "../../../helpers/serializers/UserFriendsSerializer";
 
 const { Meta } = Card;
+const { useToken } = theme;
 
 function DataWidget(props) {
+    const { token } = useToken();
     const dispatch = useDispatch();
     const [messageApi, contextHolder] = message.useMessage();
     const currentUserData = useSelector((state) =>
@@ -58,12 +60,13 @@ function DataWidget(props) {
                       })
             );
             if (!isFriend) {
-                const notificationResponse = await UserNotificationsService.create({
-                    username: username,
-                    toUserId: props.userId
-                })
+                const notificationResponse =
+                    await UserNotificationsService.create({
+                        username: username,
+                        toUserId: props.userId,
+                    });
                 if (!notificationResponse.error) {
-                    return true
+                    return true;
                 } else {
                     messageApi.open({
                         type: "error",
@@ -89,6 +92,7 @@ function DataWidget(props) {
                         <Button
                             onClick={() => addRemoveFriend()}
                             icon={<UserAddOutlined />}
+                            disabled={props.loading}
                         >
                             Dodaj do znajomych
                         </Button>
@@ -96,6 +100,8 @@ function DataWidget(props) {
                         <Button
                             onClick={() => addRemoveFriend()}
                             icon={<UserDeleteOutlined />}
+                            danger
+                            disabled={props.loading}
                         >
                             Usuń ze znajomych
                         </Button>

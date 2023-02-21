@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { UserOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import { UserOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Avatar, List, message, Card, Button, Space } from "antd";
 import VirtualList from "rc-virtual-list";
 import { useDispatch, useSelector } from "react-redux";
@@ -96,10 +96,11 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
                                     {isAuthUserProfile && (
                                         <Button
                                             disabled={loading}
-                                            icon={<MinusCircleOutlined />}
+                                            icon={<DeleteOutlined />}
                                             onClick={() =>
                                                 addRemoveFriend(item._id)
                                             }
+                                            danger
                                         />
                                     )}
                                 </List.Item>

@@ -1,10 +1,11 @@
 import React from "react";
-import { Card, List, Badge } from "antd";
+import { Card, List, Badge, Space, Button } from "antd";
 import { NavLink } from "react-router-dom";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const { Meta } = Card;
 
-function Games({ games }) {
+function Games({ games, isUserGames, addRemoveGame, isAuthUserProfile, loading }) {
     return (
         <List
             grid={{
@@ -19,8 +20,27 @@ function Games({ games }) {
             dataSource={games}
             renderItem={(item) => (
                 <List.Item style={{ padding: 0 }}>
+                    {isUserGames && isAuthUserProfile && (
+                        <Space
+                            style={{
+                                width: "100%",
+                                justifyContent: "center",
+                                marginBottom: 10,
+                            }}
+                        >
+                            <Button
+                                shape="circle"
+                                size="large"
+                                icon={<DeleteOutlined />}
+                                danger
+                                onClick={() => addRemoveGame(item.id)}
+                                disabled={loading}
+                            />
+                        </Space>
+                    )}
                     <NavLink to={`/game/${item.id}`}>
                         <Card
+                            actions
                             hoverable
                             cover={
                                 <img

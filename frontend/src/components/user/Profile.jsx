@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { message, Row, Col } from "antd";
+import { message, Row, Col, Space } from "antd";
 import * as UserDetailsService from "../../api/services/UserDetailsService";
 import DataWidget from "./widgets/DataWidget";
 import FriendsWidget from "./widgets/FriendsWidget";
+import GamesWidget from "./widgets/GamesWidget";
+import Spinner from "../loading/Spinner";
 
 function Profile({ currentUser, loading, setLoading, isAuth }) {
     const [user, setUser] = useState(null);
@@ -26,7 +28,12 @@ function Profile({ currentUser, loading, setLoading, isAuth }) {
         getUser();
     }, [id]);
 
-    if (!user) return null;
+    if (!user)
+        return (
+            <Space style={{ width: "100%", justifyContent: "center" }}>
+                <Spinner />
+            </Space>
+        );
 
     return (
         <>
@@ -52,7 +59,14 @@ function Profile({ currentUser, loading, setLoading, isAuth }) {
                         setLoading={setLoading}
                     />
                 </Col>
-                <Col xs={24}>Games</Col>
+                <Col xs={24}>
+                    <GamesWidget
+                        userId={id}
+                        currentUser={currentUser}
+                        loading={loading}
+                        setLoading={setLoading}
+                    />
+                </Col>
             </Row>
         </>
     );

@@ -1,17 +1,17 @@
 import "./Navbar.css";
 import React from "react";
 import { MenuOutlined, UserOutlined } from "@ant-design/icons";
-import { Input, Menu, Typography, Grid } from "antd";
+import { Menu, Grid } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../state";
 import Notifications from "../notifications/Notifications";
+import Searchbar from "./Searchbar";
+import LogoBig from "../../icons/LogoBig";
 
-const { Search } = Input;
-const { Title } = Typography;
 const { useBreakpoint } = Grid;
 
-function Navbar({ isAuth, currentUser }) {
+function Navbar({ isAuth, currentUser, loading, setLoading }) {
     const location = useLocation();
     const dispatch = useDispatch();
     const { pathname } = location;
@@ -23,45 +23,20 @@ function Navbar({ isAuth, currentUser }) {
             style={{ display: "flex" }}
             selectedKeys={[pathname]}
         >
-            {breakpoints.xs ? (
-                <Menu.Item key="/">
-                    <Link to="/">
-                        <Title
-                            level={4}
-                            style={{
-                                fontWeight: 700,
-                                margin: "18px 0px 19px 0",
-                            }}
-                        >
-                            GBAG
-                        </Title>
-                    </Link>
-                </Menu.Item>
-            ) : (
-                <Menu.Item key="/">
-                    <Link to="/">
-                        <Title
-                            level={4}
-                            style={{
-                                fontWeight: 700,
-                                margin: "18px 0px 19px 0",
-                            }}
-                        >
-                            GAMEBAG
-                        </Title>
-                    </Link>
+            <Menu.Item key="/" style={{ top: 12 }}>
+                <Link to="/">
+                    <LogoBig style={{ width: 150 }} />
+                </Link>
+            </Menu.Item>
+
+            {!breakpoints.xs && (
+                <Menu.Item
+                    style={{ width: "50%", cursor: "default" }}
+                    key="searchBar"
+                >
+                    <Searchbar loading={loading} setLoading={setLoading} />
                 </Menu.Item>
             )}
-            <Menu.Item
-                style={{ width: "50%", cursor: "default" }}
-                key="searchBar"
-            >
-                <Search
-                    placeholder="wpisz wyszukiwaną frazę..."
-                    allowClear
-                    style={{ marginTop: 16 }}
-                />
-            </Menu.Item>
             {breakpoints.md ? (
                 <>
                     <Menu.SubMenu

@@ -1,40 +1,49 @@
 import React, { useEffect, useState, useRef } from "react";
 import { message, Row, Col, Space } from "antd";
-import * as GamesService from "../../api/services/rawg-services/GamesService";
-import Games from "../games/Games";
+import * as FiltersService from "../../api/services/rawg-services/FiltersService";
 import { useDispatch, useSelector } from "react-redux";
-import { addGamesPage, setGames } from "../../state";
+import { addFiltersPage, setFilters } from "../../state";
 import useOnScreen from "../../hooks/useOnScreen";
-import { useLocation, useParams } from "react-router-dom";
-import Spinner from "../loading/Spinner";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Spin } from "antd";
+import { useLocation } from "react-router-dom";
+import Filters from "./Filters";
 
-function Home({ loading, setLoading }) {
+const spinIcon = (
+    <LoadingOutlined
+        style={{
+            fontSize: 32,
+        }}
+        spin
+    />
+);
+
+function FiltersPage({ loading, setLoading }) {
     const bottomRef = useRef(null);
-    const games = useSelector((state) => state.games);
+    const filters = useSelector((state) => state.filters);
     const dispatch = useDispatch();
     const [messageApi, contextHolder] = message.useMessage();
     const [page, setPage] = useState(1);
     const isBottom = useOnScreen(bottomRef);
     const { pathname } = useLocation();
-    const { name } = useParams();
     const [dataEnd, setDataEnd] = useState(false);
 
-    const getGames = async (param, id) => {
+    const getFilters = async (name) => {
         if (dataEnd) {
             return null;
         }
         setLoading(true);
-        const response = await GamesService.getGames(page, param, id);
+        const response = await FiltersService.getFilters(page, name);
         setLoading(false);
         if (response.next === null) {
             setDataEnd(true);
         }
         if (!response.error) {
             if (page === 1) {
-                dispatch(setGames({ games: response.results }));
+                dispatch(setFilters({ filters: response.results }));
                 setPage(2);
             } else if (isBottom) {
-                dispatch(addGamesPage({ games: response.results }));
+                dispatch(addFiltersPage({ filters: response.results }));
                 setPage(page + 1);
             }
         } else {
@@ -46,28 +55,26 @@ function Home({ loading, setLoading }) {
     };
 
     const handleQueryParams = () => {
-        if (pathname.startsWith("/genres")) {
-            getGames("genres", name);
-        } else if (pathname.startsWith("/tags")) {
-            getGames("tags", name);
-        } else if (pathname.startsWith("/developers")) {
-            getGames("developers", name);
-        } else if (pathname.startsWith("/platforms")) {
-            getGames("platforms", name);
-        } else {
-            getGames();
+        if (pathname === "/genres") {
+            getFilters("/genres");
+        } else if (pathname === "/tags") {
+            getFilters("/tags");
+        } else if (pathname === "/developers") {
+            getFilters("/developers");
+        } else if (pathname === "/platforms") {
+            getFilters("/platforms");
         }
     };
 
     useEffect(() => {
-        dispatch(setGames({ games: [] }));
+        dispatch(setFilters({ filters: [] }));
         setPage(1);
         setDataEnd(false)
     }, [pathname]);
 
     useEffect(() => {
         handleQueryParams();
-        console.log(games);
+        console.log(filters);
     }, [isBottom]);
 
     return (
@@ -75,7 +82,7 @@ function Home({ loading, setLoading }) {
             {contextHolder}
             <Row gutter={[24, 24]}>
                 <Col xs={24}>
-                    <Games games={games} isUserGames={false}/>
+                    <Filters filters={filters} />
                 </Col>
                 <Col ref={bottomRef} xs={24}>
                     <Space
@@ -84,7 +91,7 @@ function Home({ loading, setLoading }) {
                             justifyContent: "center",
                         }}
                     >
-                        {loading && <Spinner />}
+                        {loading && <Spin indicator={spinIcon} />}
                     </Space>
                 </Col>
             </Row>
@@ -92,4 +99,4 @@ function Home({ loading, setLoading }) {
     );
 }
 
-export default Home;
+export default FiltersPage;

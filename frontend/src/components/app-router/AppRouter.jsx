@@ -8,6 +8,7 @@ import Profile from "../user/Profile";
 import SignForm from "../user/SignForm";
 import Sidebar from "../side-bar/Sidebar";
 import Game from "../games/Game";
+import FiltersPage from "../Filters/FiltersPage";
 
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
@@ -24,11 +25,24 @@ function AppRouter({ isAuth, currentUser, loading, setLoading }) {
                     padding: breakpoints.xxl ? "0 200px" : 0,
                 }}
             >
-                <Navbar isAuth={isAuth} currentUser={currentUser} />
+                <Navbar
+                    isAuth={isAuth}
+                    currentUser={currentUser}
+                    loading={loading}
+                    setLoading={setLoading}
+                />
             </Header>
             <Content style={{ padding: breakpoints.xxl ? "16px 216px" : 16 }}>
                 <Routes>
-                    <Route path="/" element={<Sidebar />}>
+                    <Route
+                        path="/"
+                        element={
+                            <Sidebar
+                                loading={loading}
+                                setLoading={setLoading}
+                            />
+                        }
+                    >
                         <Route
                             path=""
                             element={
@@ -38,7 +52,89 @@ function AppRouter({ isAuth, currentUser, loading, setLoading }) {
                                 />
                             }
                         />
-                        <Route path="/game/:id" element={<Game />} />
+                        <Route
+                            path="/platforms"
+                            element={
+                                <FiltersPage
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/genres"
+                            element={
+                                <FiltersPage
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/tags"
+                            element={
+                                <FiltersPage
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/developers"
+                            element={
+                                <FiltersPage
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/platforms/:name"
+                            element={
+                                <Home
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/genres/:name"
+                            element={
+                                <Home
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/tags/:name"
+                            element={
+                                <Home
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/developers/:name"
+                            element={
+                                <Home
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/game/:id"
+                            element={
+                                <Game
+                                    loading={loading}
+                                    setLoading={setLoading}
+                                    currentUser={currentUser}
+                                    isAuth={isAuth}
+                                />
+                            }
+                        />
                     </Route>
                     <Route
                         path="/user/:id"

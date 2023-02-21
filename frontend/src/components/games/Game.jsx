@@ -11,27 +11,38 @@ import {
     Button,
     Tag,
     Rate,
-    Badge,
     Progress,
     Carousel,
     Image,
+    List,
+    Avatar,
 } from "antd";
+import { Comment } from '@ant-design/compatible';
 import {
     CalendarOutlined,
     PlusCircleOutlined,
     ClockCircleOutlined,
+    RedditOutlined,
+    UserOutlined,
+    MinusCircleOutlined,
 } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import * as GamesService from "../../api/services/rawg-services/GamesService";
+import * as UserDetailsService from "../../api/services/UserDetailsService";
+import * as GameCommentsService from "../../api/services/GameCommentsService";
 import {
     handlePlatformIcon,
     handlePlatformSimplify,
 } from "../../helpers/HandlePlatformIcon";
 import convertDate from "../../helpers/HandleDateFormat";
-import { FaThumbsUp, FaThumbsDown, FaPoop } from "react-icons/fa";
+import { FaThumbsUp, FaThumbsDown, FaPoop, FaWindows } from "react-icons/fa";
 import { GiGoat } from "react-icons/gi";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setGameComments, setUserGames } from "../../state";
+import Spinner from "../loading/Spinner";
+import "./Game.css";
 
-const { Meta } = Card;
 const { Title, Text, Paragraph } = Typography;
 const { useToken } = theme;
 
@@ -42,23 +53,25 @@ const customIcons = {
     4: <GiGoat />,
 };
 
-const contentStyle = {
-    height: "260px",
-    color: "#fff",
-    lineHeight: "260px",
-    textAlign: "center",
-    background: "#364d79",
-};
-
-function Game() {
+function Game({ loading, setLoading, currentUser, isAuth }) {
+    const dispatch = useDispatch();
     const { token } = useToken();
     const [game, setGame] = useState(null);
     const [gameDb, setGameDb] = useState(null);
     const [gameTrailers, setGameTrailers] = useState(null);
     const [gameScreenshots, setGameScreenshots] = useState(null);
-    const [ellipsis, setEllipsis] = useState({ rows: 3 });
+    const [gameReddits, setGameReddits] = useState(null);
+    const [ellipsis, setEllipsis] = useState({
+        description: { rows: 3 },
+        requirements: { rows: 3 },
+    });
     const [messageApi, contextHolder] = message.useMessage();
     const { id } = useParams();
+    const currentUserGames = useSelector((state) =>
+        state.user ? state.user.gamesPlayed : []
+    );
+    const gameComments = useSelector((state) => state.gameComments);
+    const isUserGame = currentUserGames.includes(id);
 
     const getGameFromApi = async () => {
         const response = await GamesService.getGameDetails(id);
@@ -111,6 +124,49 @@ function Game() {
         }
     };
 
+    const getGameReddits = async () => {
+        const response = await GamesService.getGameReddits(id);
+        if (!response.error) {
+            console.log(response.results);
+            setGameReddits(response.results);
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
+    const getGameComments = async () => {
+        const response = await GameCommentsService.getGameComments(id);
+        if (!response.error) {
+            console.log(response);
+            dispatch(setGameComments({ comments: response }));
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
+    const addRemoveGame = async (gameId) => {
+        setLoading(true);
+        const response = await UserDetailsService.addRemoveGame(
+            currentUser,
+            gameId
+        );
+        setLoading(false);
+        if (!response.error) {
+            dispatch(setUserGames({ games: response }));
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    };
+
     const handlePlatforms = (arr) => {
         const platforms = [];
         arr?.map((platform) => platforms.push(platform.platform.slug));
@@ -134,22 +190,85 @@ function Game() {
         ));
     };
 
+    const handleSystemRequirements = (arr) => {
+        const platform = arr?.find((item) => item.platform.slug === "pc");
+        const minimumReq = platform?.requirements.minimum
+            ? platform.requirements.minimum
+            : null;
+        const recommendedReq = platform?.requirements.recommended
+            ? platform.requirements.recommended
+            : null;
+        if (!recommendedReq || !minimumReq) return null;
+        const indexMin = minimumReq?.indexOf("Additional Notes:");
+        const indexRec = recommendedReq?.indexOf("Additional Notes:");
+        const minimumReqTruncated = minimumReq?.slice(0, indexMin);
+        const maximumReqTruncated = recommendedReq?.slice(0, indexRec);
+
+        return (
+            <Space
+                direction="vertical"
+                style={{ marginTop: 10, marginLeft: 5, marginBottom: 20 }}
+            >
+                <Text type="secondary">Minimalne</Text>
+                <Paragraph ellipsis={ellipsis.requirements}>
+                    {minimumReqTruncated.replace("Minimum:", "")}
+                </Paragraph>
+                <Text type="secondary">Rekomendowane</Text>
+                <Paragraph ellipsis={ellipsis.requirements}>
+                    {maximumReqTruncated.replace("Recommended:", "")}
+                </Paragraph>
+                {ellipsis.requirements ? (
+                    <Button
+                        name="requirements"
+                        size="small"
+                        onClick={(e) => setExpanded(e)}
+                        style={{ float: "right" }}
+                    >
+                        Rozwiń
+                    </Button>
+                ) : (
+                    <Button
+                        name="requirements"
+                        size="small"
+                        onClick={(e) => setCollapsed(e)}
+                        style={{ float: "right" }}
+                    >
+                        Zwiń
+                    </Button>
+                )}
+            </Space>
+        );
+    };
+
     useEffect(() => {
         getGameFromApi();
         getGame();
         getGameTrailers();
         getGameScreenshots();
+        getGameReddits();
+        getGameComments();
     }, []);
 
-    const setExpanded = () => {
-        setEllipsis(false);
+    const setExpanded = (e) => {
+        setEllipsis({
+            ...ellipsis,
+            [e.currentTarget.name]: false,
+        });
     };
 
-    const setCollapsed = () => {
-        setEllipsis({ rows: 3 });
+    const setCollapsed = (e) => {
+        setEllipsis({
+            ...ellipsis,
+            [e.currentTarget.name]: { rows: 3 },
+        });
     };
 
-    if (!game) return null;
+    if (!game)
+        return (
+            <Space style={{ width: "100%", justifyContent: "center" }}>
+                <Spinner />
+            </Space>
+        );
 
     return (
         <>
@@ -179,7 +298,7 @@ function Game() {
                             <Tooltip title="Średni czas przejścia">
                                 <Tag
                                     icon={<ClockCircleOutlined />}
-                                    color="#00c1c1d6"
+                                    color="#28BEE0"
                                     style={{ marginRight: 2 }}
                                 >
                                     {game.playtime}h
@@ -191,7 +310,12 @@ function Game() {
                     <Card
                         bordered={false}
                         cover={
-                            <img alt="gameImg" src={game.background_image} />
+                            game.background_image ? (
+                                <img
+                                    alt="gameImg"
+                                    src={game.background_image}
+                                />
+                            ) : null
                         }
                     >
                         <Space
@@ -203,7 +327,7 @@ function Game() {
                             <Title level={2}>{game.name}</Title>
                             <Progress
                                 type="circle"
-                                percent={game.metacritic}
+                                percent={game.metacritic ? game.metacritic : 0}
                                 strokeColor={
                                     game.metacritic > 74
                                         ? "#52c41a"
@@ -218,21 +342,32 @@ function Game() {
                         <Text type="secondary">Gatunek </Text>
                         <div style={{ marginBottom: 8 }}>
                             {game.genres?.map((tag) => (
-                                <Tag
-                                    color="cyan"
-                                    style={{ marginBottom: 3 }}
-                                    key={tag.id}
-                                >
-                                    {tag.name}
-                                </Tag>
+                                <Link to={`/genres/${tag.id}`} key={tag.id}>
+                                    <Tag
+                                        color="blue"
+                                        style={{
+                                            marginBottom: 3,
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        {tag.name}
+                                    </Tag>
+                                </Link>
                             ))}
                         </div>
                         <Text type="secondary">Tagi </Text>
                         <div style={{ marginBottom: 10 }}>
                             {game.tags?.map((tag) => (
-                                <Tag style={{ marginBottom: 3 }} key={tag.id}>
-                                    {tag.name}
-                                </Tag>
+                                <Link to={`/tags/${tag.id}`} key={tag.id}>
+                                    <Tag
+                                        style={{
+                                            marginBottom: 3,
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        {tag.name}
+                                    </Tag>
+                                </Link>
                             ))}
                         </div>
                         <Space
@@ -243,37 +378,57 @@ function Game() {
                             }}
                         >
                             <Rate
-                                style={{ color: "#00c1c1d6" }}
+                                style={{ color: "#28BEE0" }}
                                 character={({ index }) =>
                                     customIcons[index + 1]
                                 }
                             />
-                            <Button icon={<PlusCircleOutlined />}>
-                                Dodaj do biblioteki
-                            </Button>
+                            {!isAuth ? null : isUserGame ? (
+                                <Button
+                                    icon={<MinusCircleOutlined />}
+                                    onClick={() => addRemoveGame(game.id)}
+                                    disabled={loading}
+                                >
+                                    Usuń z biblioteki
+                                </Button>
+                            ) : (
+                                <Button
+                                    icon={<PlusCircleOutlined />}
+                                    onClick={() => addRemoveGame(game.id)}
+                                    disabled={loading}
+                                >
+                                    Dodaj do biblioteki
+                                </Button>
+                            )}
                         </Space>
                     </Card>
                     <Card style={{ marginTop: 6 }}>
                         <Space direction="vertical" size={2}>
                             <Title level={4}>Opis [EN]</Title>
                             <Paragraph
-                                type={ellipsis ? "secondary" : "primary"}
-                                ellipsis={ellipsis}
+                                type={
+                                    ellipsis.description
+                                        ? "secondary"
+                                        : "primary"
+                                }
+                                ellipsis={ellipsis.description}
                             >
                                 {game.description_raw}
                             </Paragraph>
-                            {ellipsis ? (
+                            {ellipsis.description ? (
                                 <Button
+                                    name="description"
                                     size="small"
-                                    onClick={setExpanded}
+                                    onClick={(e) => setExpanded(e)}
                                     style={{ float: "right" }}
                                 >
                                     Rozwiń
                                 </Button>
                             ) : (
                                 <Button
+                                    name="description"
                                     size="small"
-                                    onClick={setCollapsed}
+                                    onClick={(e) => setCollapsed(e)}
                                     style={{ float: "right" }}
                                 >
                                     Zwiń
@@ -285,12 +440,19 @@ function Game() {
                                 <Text type="secondary">Platformy </Text>
                                 <div style={{ marginBottom: 8 }}>
                                     {game.platforms?.map((tag) => (
-                                        <Tag
-                                            style={{ marginBottom: 3 }}
+                                        <Link
+                                            to={`/platforms/${tag.platform.id}`}
                                             key={tag.platform.id}
                                         >
-                                            {tag.platform.name}
-                                        </Tag>
+                                            <Tag
+                                                style={{
+                                                    marginBottom: 3,
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {tag.platform.name}
+                                            </Tag>
+                                        </Link>
                                     ))}
                                 </div>
                             </Col>
@@ -298,12 +460,19 @@ function Game() {
                                 <Text type="secondary">Developerzy </Text>
                                 <div style={{ marginBottom: 8 }}>
                                     {game.developers?.map((tag) => (
-                                        <Tag
-                                            style={{ marginBottom: 3 }}
+                                        <Link
+                                            to={`/developers/${tag.id}`}
                                             key={tag.id}
                                         >
-                                            {tag.name}
-                                        </Tag>
+                                            <Tag
+                                                style={{
+                                                    marginBottom: 3,
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {tag.name}
+                                            </Tag>
+                                        </Link>
                                     ))}
                                 </div>
                             </Col>
@@ -311,40 +480,193 @@ function Game() {
                     </Card>
                 </Col>
                 <Col xs={24} lg={12}>
-                    {gameTrailers?.length > 0 ? (
-                        <Space direction="vertical">
-                            <video controls autoPlay muted width="100%" style={{borderRadius: token.borderRadiusLG,}}>
-                                <source
-                                    src={
-                                        gameTrailers[0].data[480]
-                                            ? gameTrailers[0].data[480]
-                                            : "empty"
-                                    }
-                                    type="video/mp4"
+                    <Card
+                        cover={
+                            gameTrailers?.length > 0 ? (
+                                <>
+                                    <video
+                                        controls
+                                        autoPlay
+                                        muted
+                                        width="100%"
+                                        style={{
+                                            borderTopLeftRadius:
+                                                token.borderRadiusLG,
+                                            borderTopRightRadius:
+                                                token.borderRadiusLG,
+                                        }}
+                                    >
+                                        <source
+                                            src={
+                                                gameTrailers[0].data[480]
+                                                    ? gameTrailers[0].data[480]
+                                                    : "empty"
+                                            }
+                                            type="video/mp4"
+                                        />
+                                        Sorry, your browser doesn't support
+                                        embedded videos.
+                                    </video>
+                                    <Space
+                                        style={{
+                                            width: "100%",
+                                            justifyContent: "center",
+                                            paddingTop: 4,
+                                        }}
+                                    >
+                                        <Image.PreviewGroup>
+                                            {gameScreenshots?.map((image) => (
+                                                <Image
+                                                    src={image.image}
+                                                    key={image.id}
+                                                    width={"33.3%"}
+                                                    style={{
+                                                        borderRadius:
+                                                            token.borderRadiusLG,
+                                                        padding: 2,
+                                                    }}
+                                                />
+                                            ))}
+                                        </Image.PreviewGroup>
+                                    </Space>
+                                </>
+                            ) : (
+                                <Image.PreviewGroup>
+                                    <Carousel autoplay infinite={false}>
+                                        {gameScreenshots?.map((image) => (
+                                            <Image
+                                                src={image.image}
+                                                key={image.id}
+                                            />
+                                        ))}
+                                    </Carousel>
+                                </Image.PreviewGroup>
+                            )
+                        }
+                    >
+                        {handleSystemRequirements(game.platforms) && (
+                            <Space
+                                style={{
+                                    width: "100%",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Text type="secondary">
+                                    Wymagania systemowe
+                                </Text>
+                                <FaWindows
+                                    style={{
+                                        fontSize: 20,
+                                        color: token.colorTextSecondary,
+                                    }}
                                 />
-                                Sorry, your browser doesn't support embedded
-                                videos.
-                            </video>
-                            <Image.PreviewGroup>
-                                {gameScreenshots?.map((image) => (
-                                    <Image
-                                        src={image.image}
-                                        key={image.id}
-                                        width={"33.3%"}
-                                        style={{borderRadius: token.borderRadiusLG, padding: 2}}
+                            </Space>
+                        )}
+                        {handleSystemRequirements(game.platforms)}
+
+                        <Text type="secondary">Reddit - posty</Text>
+
+                        <List
+                            itemLayout="horizontal"
+                            dataSource={gameReddits?.slice(0, 5)}
+                            renderItem={(item) => (
+                                <List.Item>
+                                    <List.Item.Meta
+                                        avatar={
+                                            item.image ? (
+                                                <Avatar
+                                                    size="large"
+                                                    shape="square"
+                                                    src={item.image}
+                                                />
+                                            ) : (
+                                                <Avatar
+                                                    size="large"
+                                                    shape="square"
+                                                >
+                                                    <RedditOutlined />
+                                                </Avatar>
+                                            )
+                                        }
+                                        title={
+                                            <Paragraph ellipsis={{ rows: 2 }}>
+                                                <Link
+                                                    href={item.url}
+                                                    target="_blank"
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            </Paragraph>
+                                        }
+                                        description={
+                                            <>
+                                                <UserOutlined />{" "}
+                                                {item.username.replace(
+                                                    "/u/",
+                                                    ""
+                                                )}
+                                            </>
+                                        }
                                     />
-                                ))}
-                            </Image.PreviewGroup>
-                        </Space>
-                    ) : (
-                        <Image.PreviewGroup>
-                            <Carousel autoplay infinite={false}>
-                                {gameScreenshots?.map((image) => (
-                                    <Image src={image.image} key={image.id} />
-                                ))}
-                            </Carousel>
-                        </Image.PreviewGroup>
-                    )}
+                                </List.Item>
+                            )}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24}>
+                    <Card title="Komentarze">
+                        <List
+                            itemLayout="horizontal"
+                            dataSource={gameComments}
+                            renderItem={(item) => (
+                                <List.Item>
+                                    <List.Item.Meta
+                                        avatar={
+                                            item.image ? (
+                                                <Avatar
+                                                    size="large"
+                                                    src={item.avatar}
+                                                />
+                                            ) : (
+                                                <NavLink
+                                                    to={`/user/${item.userId}`}
+                                                >
+                                                    <Avatar
+                                                        size="large"
+                                                        style={{
+                                                            backgroundColor:
+                                                                "#28BEE0",
+                                                        }}
+                                                    >
+                                                        {item.username[0].toUpperCase()}
+                                                    </Avatar>
+                                                </NavLink>
+                                            )
+                                        }
+                                        title={
+                                            <Text>
+                                                {item.content}
+                                            </Text>
+                                        }
+                                        description={
+                                            <>
+                                                <UserOutlined />{" "}
+                                                <Link
+                                                    className="user-link"
+                                                    style={{ color: "black" }}
+                                                    to={`/user/${item.userId}`}
+                                                >
+                                                    {item.username}
+                                                </Link>
+                                                {" "}
+                                                {convertDate(item.createdAt)}
+                                            </>
+                                        }
+                                    />
+                                </List.Item>
+                            )}
+                        />
+                    </Card>
                 </Col>
             </Row>
         </>
