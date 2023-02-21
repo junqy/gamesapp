@@ -17,7 +17,7 @@ import {
     List,
     Avatar,
 } from "antd";
-import { Comment } from '@ant-design/compatible';
+import { Comment } from "@ant-design/compatible";
 import {
     CalendarOutlined,
     PlusCircleOutlined,
@@ -616,17 +616,26 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                 <Col xs={24}>
                     <Card title="Komentarze">
                         {gameComments.map((item) => (
-                             <Comment
-                             author={item.username}
-                             avatar={<Avatar alt="avatar" style={{ backgroundColor: "#28BEE0" }}>{item.username[0].toUpperCase()}</Avatar>}
-                             content={item.content}
-                             datetime={
-                               <Tooltip title={convertDate(item.createdAt)}>
-                                 {calculateHours(item.createdAt)}
-                               </Tooltip>
-                             }
-                             key={item._id}
-                           />
+                            <Comment
+                                author={item.username}
+                                avatar={
+                                    <Avatar
+                                        alt="avatar"
+                                        style={{ backgroundColor: "#28BEE0" }}
+                                    >
+                                        {item.username[0].toUpperCase()}
+                                    </Avatar>
+                                }
+                                content={item.content}
+                                datetime={
+                                    <Tooltip
+                                        title={convertDate(item.createdAt)}
+                                    >
+                                        {calculateHours(item.createdAt)}
+                                    </Tooltip>
+                                }
+                                key={item._id}
+                            />
                         ))}
                     </Card>
                 </Col>
