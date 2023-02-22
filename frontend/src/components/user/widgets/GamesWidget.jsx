@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeGame, setGamesPlayed, setUserGames } from "../../../state";
 import { message, Card, Space } from "antd";
 import Games from "../../games/Games";
+import Spinner from "../../loading/Spinner";
 
 function GamesWidget({ userId, currentUser, loading, setLoading }) {
     const dispatch = useDispatch();
@@ -49,6 +50,13 @@ function GamesWidget({ userId, currentUser, loading, setLoading }) {
     useEffect(() => {
         getUserGames();
     }, [userId]);
+
+    if (!gamesPlayed)
+        return (
+            <Space style={{ width: "100%", justifyContent: "center" }}>
+                <Spinner />
+            </Space>
+        );
 
     return (
         <>

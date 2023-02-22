@@ -6,6 +6,7 @@ import VirtualList from "rc-virtual-list";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
 import { setFriends, setUserFriends } from "../../../state";
+import { serializeUserFriendsList } from "../../../helpers/serializers/UserFriendsSerializer";
 
 function FriendsWidget({ userId, currentUser, loading, setLoading }) {
     const dispatch = useDispatch();
@@ -27,6 +28,20 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
         }
     };
 
+    const getCurrentUserFriends = async () => {
+        setLoading(true);
+        const response = await UserDetailsService.getUserFriends(currentUser);
+        setLoading(false);
+        if (!response.error) {
+            dispatch(setUserFriends({ friends: serializeUserFriendsList(response) }))
+        } else {
+            messageApi.open({
+                type: "error",
+                content: "Wystąpił błąd pobierania danych.",
+            });
+        }
+    }
+
     const addRemoveFriend = async (friendId) => {
         setLoading(true);
         const response = await UserDetailsService.addRemoveFriend(
@@ -36,7 +51,9 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
         setLoading(false);
         if (!response.error) {
             dispatch(setFriends({ friends: response }));
-            dispatch(setUserFriends({ friends: response }));
+            dispatch(
+                setUserFriends({ friends: serializeUserFriendsList(response) })
+            );
         } else {
             messageApi.open({
                 type: "error",
@@ -58,6 +75,9 @@ function FriendsWidget({ userId, currentUser, loading, setLoading }) {
     };
 
     useEffect(() => {
+        if (!!currentUser) {
+            getCurrentUserFriends()
+        }
         getFriends();
     }, [userId]);
 

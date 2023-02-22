@@ -55,7 +55,7 @@ export const authSlice = createSlice({
             state.friends = action.payload.friends;
         },
         addFriend: (state, action) => {
-            state.friends.push(action.payload.friend);
+            state.friends = [...state.friends, action.payload.friend]
         },
         setNotifications: (state, action) => {
             if (state.user) {
