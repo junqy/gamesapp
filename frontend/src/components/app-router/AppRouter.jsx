@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "../home/Home";
 import Navbar from "../navbar/Navbar";
 import Games from "../games/Games";
-import { Layout, Grid } from "antd";
+import { Layout, Grid, Typography } from "antd";
 import Profile from "../user/Profile";
 import SignForm from "../user/SignForm";
 import Sidebar from "../side-bar/Sidebar";
@@ -12,6 +12,7 @@ import FiltersPage from "../Filters/FiltersPage";
 
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
+const { Link } = Typography
 
 function AppRouter({ isAuth, currentUser, loading, setLoading }) {
     const breakpoints = useBreakpoint();
@@ -157,7 +158,7 @@ function AppRouter({ isAuth, currentUser, loading, setLoading }) {
                     />
                 </Routes>
             </Content>
-            <Footer style={{ textAlign: "center" }}>GAMEBAG ©2022</Footer>
+            <Footer style={{ textAlign: "center" }}>GAMES DATA: <Link href="https://rawg.io/apidocs" target="_blank">RAWG.IO API</Link> </Footer>
         </Layout>
     );
 }

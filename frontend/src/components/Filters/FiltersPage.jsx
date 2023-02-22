@@ -27,6 +27,7 @@ function FiltersPage({ loading, setLoading }) {
     const isBottom = useOnScreen(bottomRef);
     const { pathname } = useLocation();
     const [dataEnd, setDataEnd] = useState(false);
+    const [smallData, setSmallData] = useState(false)
 
     const getFilters = async (name) => {
         if (dataEnd) {
@@ -41,8 +42,11 @@ function FiltersPage({ loading, setLoading }) {
         if (!response.error) {
             if (page === 1) {
                 dispatch(setFilters({ filters: response.results }));
+                if (response.results.length < 11) {
+                    setSmallData(true)
+                }
                 setPage(2);
-            } else if (isBottom) {
+            } else if (isBottom || smallData) {
                 dispatch(addFiltersPage({ filters: response.results }));
                 setPage(page + 1);
             }
@@ -70,11 +74,12 @@ function FiltersPage({ loading, setLoading }) {
         dispatch(setFilters({ filters: [] }));
         setPage(1);
         setDataEnd(false)
+        setSmallData(false)
     }, [pathname]);
 
     useEffect(() => {
         handleQueryParams();
-    }, [isBottom]);
+    }, [isBottom, smallData]);
 
     return (
         <>

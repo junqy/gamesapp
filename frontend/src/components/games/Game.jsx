@@ -347,7 +347,12 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
         return (
             <Space
                 direction="vertical"
-                style={{ marginTop: 10, marginLeft: 5, marginBottom: 20 }}
+                style={{
+                    marginTop: 10,
+                    marginLeft: 5,
+                    marginBottom: 20,
+                    width: "100%",
+                }}
             >
                 <Text type="secondary">Minimalne</Text>
                 <Paragraph ellipsis={ellipsis.requirements}>
@@ -510,9 +515,9 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                                     )}
                                 />
                             </Space>
-                            <Space direction="vertical" size={0}>
+                            <Space direction="vertical" size={0} style={{marginTop: 8}}>
                                 <Text type="secondary">Gatunek </Text>
-                                <div style={{ marginBottom: 8 }}>
+                                <div style={{ marginBottom: 8}}>
                                     {game.genres?.map((tag) => (
                                         <Link
                                             to={`/genres/${tag.id}`}
@@ -754,9 +759,9 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                             </Space>
                         )}
                         {handleSystemRequirements(game.platforms)}
-
-                        <Text type="secondary">Reddit - posty</Text>
-
+                        <Space style={{ width: "100%" }}>
+                            <Text type="secondary">Reddit - posty</Text>
+                        </Space>
                         <List
                             itemLayout="horizontal"
                             dataSource={gameReddits?.slice(0, 5)}
@@ -929,13 +934,14 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                                 ]}
                             >
                                 <Mentions
+                                    disabled={!isAuth}
                                     rows={3}
                                     placeholder="Wprowadź swój komentarz (użyj @ aby komuś odpowiedzieć)"
                                     options={handleUsersMentions(gameComments)}
                                 />
                             </Form.Item>
                             <Form.Item>
-                                <Button htmlType="submit" disabled={loading}>
+                                <Button htmlType="submit" disabled={!isAuth || loading}>
                                     Dodaj komentarz
                                 </Button>
                             </Form.Item>

@@ -38,8 +38,8 @@ export const authSlice = createSlice({
             }
         },
         removeGame: (state, action) => {
-            const game = state.gamesPlayed.find((item) => item.id === action.payload.id)
-            state.gamesPlayed.pop(game)
+            const newGames = state.gamesPlayed.filter((item) => item.id !== action.payload.id)
+            state.gamesPlayed = newGames
         },
         setGamesPlayed: (state, action) => {
             state.gamesPlayed = action.payload.games;
@@ -81,8 +81,8 @@ export const authSlice = createSlice({
             state.gameComments.map((item) => item._id === action.payload.id ? item.likes = action.payload.likes : item)
         },
         removeGameComment: (state, action) => {
-            const comment = state.gameComments.find((item) => item._id === action.payload.id)
-            state.gameComments.pop(comment)
+            const newComments = state.gameComments.filter((item) => item._id !== action.payload.id)
+            state.gameComments = newComments
         },
         addGamesPage: (state, action) => {
             state.games = [...state.games, ...action.payload.games];

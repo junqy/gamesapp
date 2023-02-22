@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
 import * as GamesService from "../../../api/services/rawg-services/GamesService";
 import { useDispatch, useSelector } from "react-redux";
-import { removeGame, setGamesPlayed } from "../../../state";
+import { removeGame, setGamesPlayed, setUserGames } from "../../../state";
 import { message, Card, Space } from "antd";
 import Games from "../../games/Games";
 
@@ -37,6 +37,7 @@ function GamesWidget({ userId, currentUser, loading, setLoading }) {
         setLoading(false);
         if (!response.error) {
             dispatch(removeGame({ id: gameId }));
+            dispatch(setUserGames({ games: response }));
         } else {
             messageApi.open({
                 type: "error",
