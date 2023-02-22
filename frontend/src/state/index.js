@@ -54,6 +54,10 @@ export const authSlice = createSlice({
         setFriends: (state, action) => {
             state.friends = action.payload.friends;
         },
+        removeFriend: (state, action) => {
+            const newFriends = state.friends.filter((item) => item._id !== action.payload.id)
+            state.friends = newFriends
+        },
         addFriend: (state, action) => {
             state.friends = [...state.friends, action.payload.friend]
         },
@@ -118,6 +122,7 @@ export const {
     setGameComments,
     removeGameComment,
     likeComment,
-    setGameDb
+    setGameDb,
+    removeFriend
 } = authSlice.actions;
 export default authSlice.reducer;

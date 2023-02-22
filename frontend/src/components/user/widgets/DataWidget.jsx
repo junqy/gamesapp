@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Card, Button, message, theme } from "antd";
+import { Avatar, Card, Button, message } from "antd";
 import {
     UserOutlined,
     UserAddOutlined,
@@ -8,17 +8,18 @@ import {
 import * as UserDetailsService from "../../../api/services/UserDetailsService";
 import * as UserNotificationsService from "../../../api/services/UserNotificationsService";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriends, setUserFriends, addFriend } from "../../../state";
+import {
+    setUserFriends,
+    addFriend,
+    removeFriend,
+} from "../../../state";
 import {
     serializeUserFriendsList,
-    serializeFriendsListRemove,
 } from "../../../helpers/serializers/UserFriendsSerializer";
 
 const { Meta } = Card;
-const { useToken } = theme;
 
 function DataWidget(props) {
-    const { token } = useToken();
     const dispatch = useDispatch();
     const [messageApi, contextHolder] = message.useMessage();
     const currentUserData = useSelector((state) =>
@@ -27,7 +28,6 @@ function DataWidget(props) {
             : { username: null, email: null, picture: null, friends: [] }
     );
     const { username, email, picture, friends } = currentUserData;
-    const friendsFromProfile = useSelector((state) => state.friends);
     const isFriend = friends.includes(props.userId);
     const isAuthUserProfile = props.currentUser === props.userId;
 
@@ -52,11 +52,8 @@ function DataWidget(props) {
                               email: email,
                           },
                       })
-                    : setFriends({
-                          friends: serializeFriendsListRemove(
-                              friendsFromProfile,
-                              props.currentUser
-                          ),
+                    : removeFriend({
+                          id: props.currentUser,
                       })
             );
             if (!isFriend) {

@@ -5,7 +5,7 @@ import { axiosErrorHandlers } from "./services/ErrorHandler";
 export const JSON_FORMAT = "application/json";
 export const MULTIPART_FORM_DATA_FORMAT = "multipart/form-data";
 export const api = axios.create({
-    baseURL: "https://gamebag-api.onrender.com/",
+    baseURL: process.env.REACT_APP_SERVER_URL,
     timeout: 50000,
 });
 
