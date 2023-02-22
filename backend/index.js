@@ -14,6 +14,7 @@ import gameRoutes from "./routes/games.js"
 import notificationRoutes from "./routes/notifications.js"
 import commentsRoutes from "./routes/comments.js"
 import { register } from "./controllers/auth.js"
+import corsOptions from "./config/corsOptions.js"
 
 // CONFIG
 // .env file needs to update mongo_url for latest node.js (now is for 2.2.12)
@@ -28,7 +29,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }))
 app.use(morgan("common"))
 app.use(bodyParser.json({ limit: "30mb", extended: true }))
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }))
-app.use(cors())
+app.use(cors(corsOptions))
 app.use("/assets", express.static(path.join(__dirname, 'public/assets')))
 
 // FILE STORAGE
