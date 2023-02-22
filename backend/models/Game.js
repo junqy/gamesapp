@@ -5,13 +5,9 @@ const GameSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    comments: {
-        type: Array,
-        default: []
-    },
     ratings: {
-        type: Array,
-        default: []
+        type: Map,
+        of: String
     }
 }, { timestamps: true })
 

@@ -392,7 +392,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
         getGameScreenshots();
         getGameReddits();
         getGameComments();
-    }, []);
+    }, [id]);
 
     const setExpanded = (e) => {
         setEllipsis({

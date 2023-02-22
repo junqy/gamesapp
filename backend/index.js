@@ -12,9 +12,11 @@ import authRoutes from "./routes/auth.js"
 import userRoutes from "./routes/users.js"
 import gameRoutes from "./routes/games.js"
 import notificationRoutes from "./routes/notifications.js"
+import commentsRoutes from "./routes/comments.js"
 import { register } from "./controllers/auth.js"
 
 // CONFIG
+// .env file needs to update mongo_url for latest node.js (now is for 2.2.12)
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -47,9 +49,10 @@ app.post("/auth/register", upload.single("picture"), register)
 
 // ROUTES
 app.use("/auth", authRoutes)
-app.use("/users", userRoutes)
+app.use("/users", upload.single("picture"), userRoutes)
 app.use("/games", gameRoutes)
 app.use("/notifications", notificationRoutes)
+app.use("/comments", commentsRoutes)
 
 // MONGOOSE SETUP
 

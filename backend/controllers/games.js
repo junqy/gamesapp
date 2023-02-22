@@ -70,8 +70,27 @@ export const getGame = async (req, res) => {
             const savedGame = await newGame.save();
             res.status(201).json(savedGame);
         }
-        
     } catch (err) {
         res.status(404).json({ message: err.message });
     }
 };
+
+export const rateGame = async (req, res) => {
+    try {
+        const { apiId } = req.params;
+        const { userId, rate } = req.body;
+        const game = await Game.find({apiId})
+
+        game[0].ratings.set(userId, rate)
+
+        const updatedGame = await Game.findOneAndUpdate(
+            { apiId: apiId },
+            { ratings: game[0].ratings },
+            {new : true}
+        )
+
+        res.status(200).json(updatedGame);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
