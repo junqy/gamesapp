@@ -294,7 +294,7 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
             0
         );
         const length = Object.keys(ratings).length;
-        return sumValues / length;
+        return (sumValues / length).toFixed(1);
     };
 
     const handleUserRating = (rate) => {
@@ -786,12 +786,12 @@ function Game({ loading, setLoading, currentUser, isAuth }) {
                                         }
                                         title={
                                             <Paragraph ellipsis={{ rows: 2 }}>
-                                                <Link
+                                                <a
                                                     href={item.url}
                                                     target="_blank"
                                                 >
                                                     {item.name}
-                                                </Link>
+                                                </a>
                                             </Paragraph>
                                         }
                                         description={
